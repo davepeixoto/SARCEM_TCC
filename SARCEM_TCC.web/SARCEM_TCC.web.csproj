@@ -192,7 +192,6 @@
     <Compile Include="Controllers\Api\ContratosController.cs" />
     <Compile Include="Controllers\Api\EstoqueConsumoAtuaisController.cs" />
     <Compile Include="Controllers\Api\EstoqueHistoricosController.cs" />
-    <Compile Include="Controllers\Api\F0b1sController.cs" />
     <Compile Include="Controllers\Api\HistConsumosController.cs" />
     <Compile Include="Controllers\Api\MateriaisController.cs" />
     <Compile Include="Controllers\Api\MiniImpaqsController.cs" />
@@ -204,7 +203,6 @@
     <Compile Include="Controllers\ContratoController.cs" />
     <Compile Include="Controllers\EstoqueConsumoController.cs" />
     <Compile Include="Controllers\EstoqueHistoricoController.cs" />
-    <Compile Include="Controllers\F0B1Controller.cs" />
     <Compile Include="Controllers\HistConsumoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -919,8 +917,6 @@
     <Content Include="Views\EstoqueHistorico\_DropDowns.cshtml" />
     <Content Include="Views\EstoqueHistorico\_DropDownsBrazil.cshtml" />
     <Content Include="Views\EstoqueHistorico\_RadiosB.cshtml" />
-    <Content Include="Views\F0B1\Index.cshtml" />
-    <Content Include="Views\F0B1\_DropDowns.cshtml" />
     <Content Include="Views\HistConsumo\Index.cshtml" />
     <Content Include="Views\HistConsumo\_DropDowns.cshtml" />
     <Content Include="Views\HistConsumo\_DropDownsBrazil.cshtml" />

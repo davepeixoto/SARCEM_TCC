@@ -1,4 +1,4 @@
-1 - Acesse esse link (https://drive.google.com/open?id=100JGUuqM1ZgB-By2myFz_HyZxGcy3IQ9) para obter a massa de dados as bibliotecas usadas na solução.
+1 - Acesse esse link (https://drive.google.com/open?id=100JGUuqM1ZgB-By2myFz_HyZxGcy3IQ9) para obter a massa de dados e as bibliotecas usadas na solução.
 
 2 - Sobreescreva as pastas App_Data e bin da solução, pelos arquivos contidos no link.
 
