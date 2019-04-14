@@ -84,7 +84,7 @@ namespace SARCEM_TCC.web.Controllers
                 _context.Dispose();
 
             }
-            catch (System.Exception e )
+            catch (System.Exception  )
             {
                 ModelState.AddModelError("", "Login Inválido");
                 return View(model);
