@@ -1,13 +1,17 @@
-﻿Segue abaixo relação de acessos por perfil:
+1 - Acesse esse link (https://drive.google.com/open?id=100JGUuqM1ZgB-By2myFz_HyZxGcy3IQ9) para obter a massa de dados as bibliotecas usadas na solução.
 
-BR			Nome				Perfil
-BR001111	Dave Peixoto		Brazil
+2 - Sobreescreva as pastas App_Data e bin data solução, pelos arquivos contidos no link.
+
+Segue abaixo relação de acessos por perfil:
+
+BR			Nome				        Perfil
+BR001111	Dave Peixoto		  Brazil
 BR009999	Washington Sousa	Ceara
 BR007777	Antonio Guerra		Ceara
-BR201877	Eric Sá				Goias
+BR201877	Eric Sá				    Goias
 BR201866	Mariano Alvarez		Goias
-BR008888	Joana Paes			RioDeJaneiro
-BR004444	Tayana Bispo		RioDeJaneiro
+BR008888	Joana Paes			  RioDeJaneiro
+BR004444	Tayana Bispo		  RioDeJaneiro
 
 Para todos os acessos a senha é: "Ola123@"
 
