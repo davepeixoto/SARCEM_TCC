@@ -4,14 +4,15 @@
 
 Segue abaixo relação de acessos por perfil:
 
-BR			Nome				        Perfil
-BR001111	Dave Peixoto		  Brazil
-BR009999	Washington Sousa	Ceara
-BR007777	Antonio Guerra		Ceara
-BR201877	Eric Sá				    Goias
-BR201866	Mariano Alvarez		Goias
-BR008888	Joana Paes			  RioDeJaneiro
-BR004444	Tayana Bispo		  RioDeJaneiro
+|BR			  |Nome				      |Perfil
+-------------------------------------------
+|BR001111	|Dave Peixoto		  |Brazil       |
+|BR009999	|Washington Sousa	|Ceara        |
+|BR007777	|Antonio Guerra		|Ceara        |
+|BR201877	|Eric Sá				  |Goias        |
+|BR201866	|Mariano Alvarez	|Goias        |
+|BR008888	|Joana Paes			  |RioDeJaneiro |
+|BR004444	|Tayana Bispo		  |RioDeJaneiro |
 
 Para todos os acessos a senha é: "Ola123@"
 
