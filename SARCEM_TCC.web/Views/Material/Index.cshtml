@@ -1,0 +1,536 @@
+﻿@using SARCEM_TCC.web.Models
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "Index";
+}
+
+    <h2>Relação de Materiais</h2>
+
+    <h4>Listagem dos materiais catalogados no bando de dados da Logística Brasil, com o valor unitário referente aos mesmos.</h4>
+
+    <div class="row">
+        <div id="DropDownsContainer" style="margin-top: 1%;">
+         
+            
+                @Html.Partial("_DropDowns")
+            
+        </div>
+    </div>
+
+
+
+
+
+    <div class="container">
+
+        <div class="col-lg-12 ">
+            <div style="margin-top: 2%;">
+
+                <div class="pull-right">
+                    <button id="btn_exporta" class="btn btn-default xlsx">Exporte para Excel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div style="margin-top: 2%;">
+            <div class="col-lg-12">
+                <style>
+                    th {
+                        text-align: center;
+                    }
+
+                    .DTFC_LeftBodyLiner {
+                        top: -12px !important;
+                    }
+
+                    .pencil {
+                        border-radius: 5px;
+                        height: 25px;
+                    }
+
+                        .pencil:hover {
+                            box-shadow: 3px -2px 18px 7px black;
+                        }
+                    /*.red {
+                        background-color: #a71616;
+                        color: #ffffff;
+                    }*/
+                    
+                </style>
+@if (Request.IsAuthenticated && User.IsInRole(RoleName.Logistica))
+{
+    <div id="divMaterial" class="perEdit">    </div>
+}
+else
+{
+     <div id="divMaterial">   </div>
+}
+                
+                
+                
+
+            </div>
+        </div>
+    </div>
+
+
+
+@section scripts
+{
+    <script type="text/javascript">
+        var cabecalho
+        var dto
+        var perfil
+       
+function CarregaCabecalho() {
+
+    dto = {
+        Empresa: $('#listaEmpresa').val(),
+                Gestor: $('#listaGestor').val(),
+                Familia: $('#listaFamilia').val(),
+                Material: $('#listaMaterial').val(),
+
+
+            }
+
+    cabecalho = '';
+    cabecalho = new Array();
+
+            $.ajax({
+        type: 'GET',
+                data: {
+            dto
+                },
+                url: '/api/Materiais/TrazDropDown',
+                dataSrc: "",
+                success: function (d) {
+
+            cabecalho = d;
+            CriaDropDowm(cabecalho);
+
+        },
+                datatype: 'json'
+
+            });
+        }
+
+        function CriaDropDowm(cabecalho) {
+
+
+            $('#listaEmpresa').html('');
+
+            if (dto.Empresa === '') {
+                $('#listaEmpresa').append("<option value=''></option>");
+                cabecalho.empresas.forEach(function (e) {
+                    $('#listaEmpresa').append("<option value='" + e + "'>" + e + "</option>");
+                });
+
+            } else {
+                $('#listaEmpresa').append("<option value='" + dto.Empresa + "' selected>" + dto.Empresa + "</option>");
+                $('#listaEmpresa').append("<option value='' ></option>");
+
+            }
+
+
+            $('#listaMaterial').html('');
+            if (dto.Material === '') {
+                $('#listaMaterial').append("<option value=''></option>");
+                cabecalho.materiais.forEach(function (e) {
+                    $('#listaMaterial').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaMaterial').append("<option value='" + dto.Material + "'selected>" + dto.Material + "</option>");
+                $('#listaMaterial').append("<option value=''></option>");
+            }
+
+
+            $('#listaFamilia').html('');
+            if (dto.Familia === '') {
+                $('#listaFamilia').append("<option value=''></option>");
+                cabecalho.familias.forEach(function (e) {
+                    $('#listaFamilia').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaFamilia').append("<option value='" + dto.Familia + "'selected>" + dto.Familia + "</option>");
+                $('#listaFamilia').append("<option value=''></option>");
+            }
+
+            $('#listaGestor').html('');
+            if (dto.Gestor === '') {
+                $('#listaGestor').append("<option value=''></option>");
+                cabecalho.gestores.forEach(function (e) {
+                    $('#listaGestor').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaGestor').append("<option value='" + dto.Gestor + "' selected>" + dto.Gestor + "</option>");
+                $('#listaGestor').append("<option value=''></option>");
+            }
+
+
+
+
+            $('#listaEmpresa').select2({
+                theme: "classic",
+                placeholder: "Selecione a Empresa",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaMaterial').select2({
+                theme: "classic",
+                placeholder: "Selecione o Material",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaFamilia').select2({
+                theme: "classic",
+                placeholder: "Selecione a Família",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaGestor').select2({
+                theme: "classic",
+                placeholder: "Selecione o Gestor",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+            var estilo = $('.select2');
+
+            for (var i = 0; i < estilo.length; i++) {
+                estilo[i].style.width = '100%';
+            }
+
+
+            if (perfil == "perEdit")
+                CarregaDataTableEscrita()
+            else
+                CarregaDataTable()
+
+            
+
+        }
+
+        function ExportaPagina(result) {
+            table = '';
+
+            dataRst = '';
+
+
+
+            dataRst = new Array();
+
+
+            var i = 1;
+
+            dataRst[0] = [
+                { v: 'Empresa', t: 's' },
+                { v: 'Material', t: 's' },
+                { v: 'Descrição', t: 's' },
+                { v: 'Classe', t: 's' },
+                { v: 'Unidade de Medida', t: 's' },
+                { v: 'Classificação', t: 's' },
+                { v: 'Família', t: 's' },
+                { v: 'MG Code', t: 's' },
+                { v: 'MG Code Descrição', t: 's' },
+                { v: 'Gestor', t: 's' },
+                { v: 'Valor de Referência', t: 's' },
+                { v: 'Origem', t: 's' },
+                { v: 'Material Bloqueado', t: 's' },
+                { v: 'Material Substituido', t: 's' },
+
+            ];
+
+            result.forEach(function (r) {
+
+                dataRst[i] = [
+                    { v: r.empresaNome, t: 's' },
+                    { v: r.materialCodSap, t: 's' },
+                    { v: r.materialDescricao, t: 's' },
+                    { v: r.materialClasse, t: 's' },
+                    { v: r.materialUM, t: 's' },
+                    { v: r.classificacaoNome, t: 's' },
+                    { v: r.familiaNome, t: 's' },
+                    { v: r.mGCodeCodigoSap, t: 's' },
+                    { v: r.mGCOdeDescricao, t: 's' },
+                    { v: r.userName, t: 's' },
+                    { v: r.valorDeReferencia, t: 'n' },
+                    { v: r.origem, t: 's' },
+                    { v: r.materialBloqueado, t: 's' },
+                    { v: r.materialSubstituto, t: 's' },
+                ]
+                i++;
+            });
+
+
+
+
+            var table = $('#materialTable').tableExport();
+            table.export2file(dataRst, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Listagem_de_Materiais', '.xlsx')
+            var botao = $('#btn_exporta')[0]
+            var imagem = $('#imagemLoad')[0]
+            imagem.style.display = "none"
+            botao.style.visibility = "visible"
+            return;
+        }
+
+        function CarregaDataTable() {
+
+            var sb = $('#divMaterial')
+            sb.html('');
+            sb.append("<table id='materialTable' class='table table- striped text- nowrap table- hover'>" +
+                "  <thead > <tr>" +
+
+                "   <th>Empresa             </th> " +
+                "   <th>Material            </th> " +
+                "   <th>Descrição           </th> " +
+                "   <th>Classe              </th> " +
+                "   <th>Unidade de Medida   </th> " +
+                "   <th>Classificação       </th> " +
+                "   <th>Família             </th> " +
+                "   <th>MG Code             </th> " +
+                "   <th>MG Code Descrição   </th> " +
+                "   <th>Gestor              </th> " +
+                "   <th>valor de Referência</th> " +
+                "   <th>Origem</th> " +
+                "   <th>Material Bloqueado</th> " +
+                "   <th>Material Substituido</th> " +
+               
+                " </tr> </thead > <tbody> </tbody> </table >"
+            );
+
+            var tabela = $("#materialTable").DataTable({
+
+                ajax: {
+                    data: {
+                        dto
+                    },
+                    url: "/api/materiais/ListaMateriais",
+                    dataSrc: ""
+                },
+                columns: [
+
+                    { data: "empresaNome" },
+                    { data: "materialCodSap" },
+                    { data: "materialDescricao" },
+                    { data: "materialClasse" },
+                    { data: "materialUM" },
+                    { data: "classificacaoNome" },
+                    { data: "familiaNome" },
+                    { data: "mGCodeCodigoSap" },
+                    { data: "mGCOdeDescricao" },
+                    { data: "userName" },
+                    { data: "valorDeReferencia", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "origem" },
+                    {
+                        data: "materialBloqueado",
+                        render: function (data, type, material, td) {
+
+                            if (material.materialBloqueado) {
+
+                                return "x";
+                            }
+
+
+                            return null;
+
+
+                        }
+                    },
+                    { data: "materialSubstituto" },
+                    
+
+                ],
+
+                "scrollX": true,
+                "scrollY": "360px",
+                "scrollCollapse": true,
+                "deferRender": true,
+                "fixedColumns": {
+                    leftColumns: 2,
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    if (data.materialBloqueado != false) {
+                        $(row).addClass('red');
+
+                    }
+
+
+                }
+
+
+            })
+
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = "none"
+        }
+
+        function CarregaDataTableEscrita() {
+
+            var sb = $('#divMaterial')
+            sb.html('');
+            sb.append("<table id='materialTable' class='table table- striped text- nowrap table- hover'>" +
+                "  <thead > <tr>" +
+
+                "   <th>Empresa             </th> " +
+                "   <th>Material            </th> " +
+                "   <th>Descrição           </th> " +
+                "   <th>Classe              </th> " +
+                "   <th>Unidade de Medida   </th> " +
+                "   <th>Classificação       </th> " +
+                "   <th>Família             </th> " +
+                "   <th>MG Code             </th> " +
+                "   <th>MG Code Descrição   </th> " +
+                "   <th>Gestor              </th> " +
+                "   <th>valor de Referência</th> " +
+                "   <th>Origem</th> " +
+                "   <th>Material Bloqueado</th> " +
+                "   <th>Material Substituido</th> " +
+                "   <th>Editar              </th>" +
+                " </tr> </thead > <tbody> </tbody> </table >"
+            );
+
+            var tabela = $("#materialTable").DataTable({
+
+                ajax: {
+                    data: {
+                        dto
+                    },
+                    url: "/api/materiais/ListaMateriais",
+                    dataSrc: ""
+                },
+                columns: [
+
+                    { data: "empresaNome" },
+                    { data: "materialCodSap" },
+                    { data: "materialDescricao" },
+                    { data: "materialClasse" },
+                    { data: "materialUM" },
+                    { data: "classificacaoNome" },
+                    { data: "familiaNome" },
+                    { data: "mGCodeCodigoSap" },
+                    { data: "mGCOdeDescricao" },
+                    { data: "userName" },
+                    { data: "valorDeReferencia", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "origem" },
+                    {
+                        data: "materialBloqueado",
+                        render: function (data,type,material,td){
+
+                            if ( material.materialBloqueado) {
+                               
+                                return "x";
+                            }
+                        
+                        
+                            return null;
+
+
+                    }     
+                        
+                    },
+                    { data: "materialSubstituto" },
+
+                    {
+                        data: "materialID",
+                        render: function (data, type, material) {
+                            return "<a href='/Material/edit/" + material.materialID + "'> <img src='/imagens/pencilPqna.jpg' class='pencil' /></a>";
+                        }
+
+                    },
+
+                ],
+
+                "scrollX": true,
+                "scrollY": "360px",
+                "scrollCollapse": true,
+                "deferRender": true,
+                "fixedColumns": {
+                    leftColumns: 2,
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    if (data.materialBloqueado != false) {
+                        $(row).addClass('red');
+
+                    }
+
+
+                }
+
+
+            })
+
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = "none"
+        }
+
+        $(document).ready(function () {
+            var imgm = $('#imagemLoad')[0]
+            perfil = $('#divMaterial')[0].className
+            imgm.style.display = ""
+            CarregaCabecalho()
+            $('.demo-default').on("change", function () {
+                var imgm = $('#imagemLoad')[0]
+                imgm.style.display = ""
+
+                CarregaCabecalho()
+            });
+
+            $('#btn_exporta').on('click', function () {
+                var botao = $('#btn_exporta')[0]
+                var imagem = $('#imagemLoad')[0]
+                imagem.style.display = ""
+                botao.style.visibility = 'hidden'
+
+                $.ajax({
+                    type: 'GET',
+                    data: {
+                        dto
+                    },
+                    url: '/api/Materiais/ListaMateriais',
+                    dataSrc: "",
+                    success: function (d) {
+
+                        ExportaPagina(d);
+
+
+                    }
+
+                })
+
+            });
+        })
+
+
+
+
+    </script>
+}
+
+
+
+
+
+
+    @*"materialID"            : 1,
+        "classificacaoID"       : 2,
+        "familiaID"             : 34,
+        "mGCodeID"              : 534,
+        "empresaNome        "           : "EDR-Enel Distribuição Rio de Janeiro",
+        "materialCodSap     "        : 1111111,
+        "materialDescricao  "     : "VALVULA PVC CEM 90 MM PN 10",
+        "materialClasse     "        : "C",
+        "materialUM         "            : "CDA",
+        "classificacaoNome  "     : "Não Recorrente",
+        "familiaNome        "           : "PVC",
+        "mGCodeCodigoSap    "       : "FMTU1200",
+        "mGCOdeDescricao    "       : "Tubagens de PVC (linhas de cabo)",
+        "userName           "              : "Rafaele Neves Pereira",
+        "materialObservacoes"   : "autalização na descrição"*@

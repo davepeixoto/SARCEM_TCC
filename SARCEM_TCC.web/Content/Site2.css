@@ -1,0 +1,47 @@
+﻿
+.body-content {
+    background-image: url('../images/estrada.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+    width: 100%;
+    min-height: 600px;
+}
+
+.footer-pos {
+    width: 180px;
+    height: 20px;
+    position: relative;
+    top: 98%;
+    bottom: 1px;
+    left: 0;
+    right: 0;
+    margin-top: 5%;
+    margin-right: 1%;
+}
+
+.spaceVert_1 {
+    margin-top: 1%;
+}
+
+.label-radio {
+    float: initial;
+    font-size: small;
+}
+
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+    text-decoration: none;
+    color: #131315;
+    background-color: #282b2f;
+}
+
+
+
+.jumbotron {
+    padding-top: 0px;
+    min-height: 850px;
+}
+
+

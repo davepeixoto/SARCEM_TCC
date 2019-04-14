@@ -1,0 +1,610 @@
+﻿@using SARCEM_TCC.web.Models
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Mini Impaq";
+}
+
+
+
+
+<div style="float:left">
+<h2>Mini Impaq</h2>
+<h4>Traz um resumo referente aos materiais. Quantidades em estoque, contratos, entregas, autonomias...</h4>
+<h6>Informação atualizada em @ViewBag.data</h6>
+
+</div>
+
+
+<div style="float:right;margin-top: 2%;padding-right: 2%;">
+
+    <h5 id="headerEmpresa"> <span id="spanEmpresa"></span></h5>
+
+
+</div>
+
+@{
+    string dropdow = "";
+
+    if (User.IsInRole(RoleName.Brazil))
+    {
+        dropdow = "_DropDownsBrazil";
+    }
+    else
+    {
+
+        dropdow = "_DropDowns";
+    }
+
+
+}
+<div class="row">
+
+
+
+    <div id="DropDownsContainer" style="margin-top:1%">
+
+        @Html.Partial(dropdow)
+
+    </div>
+</div>
+
+
+
+<style>
+    .ul-resumo {
+        list-style: none;
+    }
+
+    .DTFC_LeftBodyLiner {
+        top: -12px !important;
+    }
+</style>
+
+<div class="container">
+
+    <div class="col-lg-12 ">
+        <div style="margin-top: 2%;">
+            <div class="col-lg-9">
+                <div class="pull-left">
+
+                    <ul class="ul-resumo">
+                        <li><h5>Estoque: <span id="spanEstoque" /></h5>  </li>
+                        <li><h5>Consumo: <span id="spanConsumo" /></h5></li>
+                        <li><h5>Entrada: <span id="spanEntrada" /></h5></li>
+                        <li><h6>Lembrando que o estoque informado é o físico, e o consumo e entradas referem-se ao mês vigente</h6></li>
+                    </ul>
+
+
+                </div>
+
+            </div>
+            <div class="col-lg-3">
+                <div class="pull-right">
+                    <button id="btn_exporta" class="btn btn-default xlsx">Exporte para Excel</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="row">
+    <div style="margin-top: 2%;">
+        <div class="col-lg-12">
+            <style>
+                th {
+                    text-align: center;
+                }
+            </style>
+            <div id="divMaterial">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+
+    <script>
+        var brazil
+        var cabecalho
+        var dto
+        var data
+        var tabela
+
+        data = new Date();
+        AnoAtual = data.getFullYear();
+
+        function CarregaCabecalho() {
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = ""
+            dto = {
+                Empresa: $('#listaEmpresa').val(),
+                Gestor: $('#listaGestor').val(),
+                Familia: $('#listaFamilia').val(),
+                Material: $('#listaMaterial').val(),
+
+
+            }
+
+            cabecalho = '';
+            cabecalho = new Array();
+
+            $.ajax({
+                type: 'GET',
+                data: {
+                    dto
+                },
+                url: '/api/MiniImpaqs/TrazDropDown',
+                dataSrc: "",
+                success: function (d) {
+
+                    cabecalho = d;
+                    CriaDropDowm(cabecalho);
+
+                },
+                datatype: 'json'
+
+            });
+        }
+
+        function CriaDropDowm(cabecalho) {
+            if (cabecalho.empresas.length === 1)
+                $('#spanEmpresa')[0].textContent = cabecalho.empresas[0]
+            else
+                $('#spanEmpresa')[0].textContent = ""
+
+
+
+                $('#listaEmpresa').html('');
+
+                if (dto.Empresa === '') {
+                    $('#listaEmpresa').append("<option value=''></option>");
+                    cabecalho.empresas.forEach(function (e) {
+                        $('#listaEmpresa').append("<option value='" + e + "'>" + e + "</option>");
+                    });
+
+                } else {
+                    $('#listaEmpresa').append("<option value='" + dto.Empresa + "' selected>" + dto.Empresa + "</option>");
+                    $('#listaEmpresa').append("<option value='' ></option>");
+
+                }
+
+
+
+
+            $('#listaMaterial').html('');
+            if (dto.Material === '') {
+                $('#listaMaterial').append("<option value=''></option>");
+                cabecalho.materiais.forEach(function (e) {
+                    $('#listaMaterial').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaMaterial').append("<option value='" + dto.Material + "'selected>" + dto.Material + "</option>");
+                $('#listaMaterial').append("<option value=''></option>");
+            }
+
+
+            $('#listaFamilia').html('');
+            if (dto.Familia === '') {
+                $('#listaFamilia').append("<option value=''></option>");
+                cabecalho.familias.forEach(function (e) {
+                    $('#listaFamilia').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaFamilia').append("<option value='" + dto.Familia + "'selected>" + dto.Familia + "</option>");
+                $('#listaFamilia').append("<option value=''></option>");
+            }
+
+            $('#listaGestor').html('');
+            if (dto.Gestor === '') {
+                $('#listaGestor').append("<option value=''></option>");
+                cabecalho.gestores.forEach(function (e) {
+                    $('#listaGestor').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaGestor').append("<option value='" + dto.Gestor + "' selected>" + dto.Gestor + "</option>");
+                $('#listaGestor').append("<option value=''></option>");
+            }
+
+
+
+
+            $('#listaEmpresa').select2({
+                theme: "classic",
+                placeholder: "Selecione a Empresa",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaMaterial').select2({
+                theme: "classic",
+                placeholder: "Selecione o Material",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaFamilia').select2({
+                theme: "classic",
+                placeholder: "Selecione a Família",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaGestor').select2({
+                theme: "classic",
+                placeholder: "Selecione o Gestor",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+            var estilo = $('.select2');
+
+            for (var i = 0; i < estilo.length; i++) {
+                estilo[i].style.width = '100%';
+            }
+
+
+
+
+            CarregaDataTable()
+
+        }
+
+        function ExportaPagina(result) {
+            table = '';
+
+            dataRst = '';
+
+
+
+            dataRst = new Array();
+
+
+            var i = 1;
+
+            dataRst[0] = [
+
+                { v: 'Empresa', t: 's' },
+                { v: 'Material', t: 's' },
+                { v: 'Descrição do material', t: 's' },
+                { v: 'Unidade de Medida', t: 's' },
+                { v: 'Classe', t: 's' },
+                { v: 'classificacao', t: 's' },
+                { v: 'Família', t: 's' },
+                { v: 'MG Code', t: 's' },
+                { v: 'Descrição do MG Code', t: 's' },
+                { v: 'Gestor do Material', t: 's' },
+                { v: 'Autonomia pelo Appia', t: 's' },
+                { v: 'Autonomia pelo CPM12', t: 's' },
+                { v: 'Autonomia pelo PLM', t: 's' },
+                { v: 'Autonomia com ODC pelo Appia', t: 's' },
+                { v: 'Autonomia com ODC pelo CPM12', t: 's' },
+                { v: 'Autonomia com ODC pelo PLM', t: 's' },
+                { v: 'Quantidade de Contratos', t: 's' },
+                { v: 'Saldo dos Contratos em Quantidade ', t: 's' },
+                { v: 'Média Appia em 2018', t: 's' },
+                { v: 'Total Appia em 2018', t: 's' },
+                { v: 'CPM12(Consumo médio dos últimos 12 meses)', t: 's' },
+                { v: 'PLM Médio dos próximos 12 meses', t: 's' },
+                { v: 'PLM Total dos próximos 12 meses', t: 's' },
+                { v: 'Entregas Previstas (Atrasado)', t: 's' },
+                { v: 'Entregas Previstas (Dentro do Prazo)', t: 's' },
+                { v: 'Entregas Previstas (Dentro do Corte)*', t: 's' },
+                { v: 'Estoque Físico em Qtde', t: 's' },
+                { v: 'Estoque Físico em R$', t: 's' },
+                { v: 'Consumo em Qtde', t: 's' },
+                { v: 'Consumo em R$', t: 's' },
+                { v: 'Entrada em Qtde', t: 's' },
+                { v: 'Entrada em R$', t: 's' },
+                { v: 'Preço unitário para Referência', t: 's' },
+                { v: 'Data da Informação', t: 's' },
+                { v: 'Material Bloqueado', t: 's' },
+                { v: 'Material Substituido', t: 's' },
+
+
+            ];
+
+            result.forEach(function (r) {
+
+                dataRst[i] = [
+                    { v: r.empresaNome, t: 's' },
+                    { v: r.materialCodSap, t: 's' },
+                    { v: r.materialDescricao, t: 's' },
+                    { v: r.materialUM, t: 's' },
+                    { v: r.materialClasse, t: 's' },
+                    { v: r.classificacaoNome, t: 's' },
+                    { v: r.familiaNome, t: 's' },
+                    { v: r.mGCodeCodigoSap, t: 's' },
+                    { v: r.mGCodeDescricao, t: 's' },
+                    { v: r.userName, t: 's' },
+                    { v: r.autonomiaAppia, t: 's' },
+                    { v: r.autonomiaCPM12, t: 's' },
+                    { v: r.autonomiaPLM, t: 's' },
+                    { v: r.autonomiaAppiaODC, t: 's' },
+                    { v: r.autonomiaCPM12ODC, t: 's' },
+                    { v: r.autonomiaPLMODC, t: 's' },
+                    { v: r.qtdeDeContratos, t: 'n' },
+                    { v: r.itemDoContratoQtdeDisp, t: 'n' },
+                    { v: r.mediaAppiaAnoAtual, t: 'n' },
+                    { v: r.totalAppiaAnoAtual, t: 'n' },
+                    { v: r.cpm12, t: 'n' },
+                    { v: r.mediaPLM, t: 'n' },
+                    { v: r.totalPLM, t: 'n' },
+                    { v: r.zmepAtrasado, t: 'n' },
+                    { v: r.zmepFuturo, t: 'n' },
+                    { v: r.zmepCorte, t: 'n' },
+                    { v: r.fisicoQtde, t: 'n' },
+                    { v: r.fisicoValor, t: 'n' },
+                    { v: r.consumoQtde, t: 'n' },
+                    { v: r.consumoValor, t: 'n' },
+                    { v: r.entradaQtde, t: 'n' },
+                    { v: r.entradaValor, t: 'n' },
+                    { v: r.valorDeReferencia, t: 'n' },
+                    { v: r.dataLanc, t: 'd' },
+                    { v: r.materialBloqueado, t: 's' },
+                    { v: r.materialSubstituto, t: 's' },
+
+                ]
+                i++;
+            });
+
+
+            var table = $('#impaqTable').tableExport();
+            table.export2file(dataRst, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Listagem_de_MiniImpaq', '.xlsx')
+            var botao = $('#btn_exporta')[0]
+            var imagem = $('#imagemLoad')[0]
+            imagem.style.display = "none"
+            botao.style.visibility = "visible"
+            return;
+        }
+
+        function CarregaDataTable() {
+
+            var sb = $('#divMaterial')
+            sb.html('');
+            sb.append("<table id='impaqTable' class='table table- striped text- nowrap table- hover'>" +
+                "  <thead > <tr>" +
+
+                "   <th>Empresa                                 </th> " + //0
+                "   <th>Material                                </th> " +
+                "   <th>Descrição do material                   </th> " +
+                "   <th>Unidade de Medida                       </th> " +
+                "   <th>Classe                                  </th> " +
+                "   <th>classificacao                           </th> " +
+                "   <th>Família                                 </th> " +
+                "   <th>MG Code                                 </th> " +
+                "   <th>Descrição do MG Code                    </th> " +
+                "   <th>Gestor do Material                      </th> " +
+                "   <th>Autonomia pelo Appia                     </th> " +
+                "   <th>Autonomia pelo CPM12                     </th> " +
+                "   <th>Autonomia pelo PLM                      </th> " +
+                "   <th>Autonomia com ODC pelo Appia             </th> " +
+                "   <th>Autonomia com ODC pelo CPM12             </th> " +
+                "   <th>Autonomia com ODC pelo PLM              </th> " +
+                "   <th>Quantidade de Contratos                 </th> " +
+                "   <th>Saldo dos Contratos em Quantidade       </th>" +
+                "   <th>Média Appia em 2018         </th> " +
+                "   <th>Total Appia em 2018         </th> " +
+                "   <th>CPM12 (Consumo médio dos últimos 12 meses)</th> " +
+                "   <th>PLM Médio dos próximos 12 meses </th> " +
+                "   <th>PLM Total dos próximos 12 meses </th> " +
+                "   <th>Entregas Previstas (Atrasado)           </th> " +
+                "   <th>Entregas Previstas (Dentro do Prazo)    </th> " +
+                "   <th>Entregas Previstas (Dentro do Corte)*   </th> " +
+                "   <th>Estoque Físico em Qtde	                </th> " +
+                "   <th>Estoque Físico em R$	                </th> " +
+                "   <th>Consumo em Qtde	                        </th> " +
+                "   <th>Consumo em R$                           </th> " +
+                "   <th>Entrada em Qtde	                        </th> " +
+                "   <th>Entrada em R$                           </th> " +
+                "   <th>Preço unitário para Referência</th> " +
+                "   <th>Material Bloqueado</th> " +
+                "   <th>Material Substituido</th> " +
+
+                " </tr> </thead > <tbody> </tbody> </table >"
+            );
+
+
+
+
+
+
+
+
+
+            tabela = $("#impaqTable").DataTable({
+
+                ajax: {
+                    data: {
+                        dto
+                    },
+                    url: "/api/MiniImpaqs/ListaMiniImpaq",
+                    dataSrc: ""
+                },
+                columns: [
+
+                    { data: "empresaNome" },
+                    { data: "materialCodSap" },
+                    { data: "materialDescricao" },
+                    { data: "materialUM" },
+                    { data: "materialClasse" },
+                    { data: "classificacaoNome" },
+                    { data: "familiaNome" },
+                    { data: "mGCodeCodigoSap" },
+                    { data: "mGCodeDescricao" },
+                    { data: "userName" },
+                    { data: "autonomiaAppia", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "autonomiaCPM12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "autonomiaPLM", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "autonomiaAppiaODC", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "autonomiaCPM12ODC", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "autonomiaPLMODC", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "qtdeDeContratos", render: $.fn.dataTable.render.number('.', ',', 0) },
+                    { data: "itemDoContratoQtdeDisp", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "mediaAppiaAnoAtual", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "totalAppiaAnoAtual", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "cpm12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "mediaPLM", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "totalPLM", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "zmepAtrasado", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "zmepFuturo", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "zmepCorte", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "fisicoQtde", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "fisicoValor", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "consumoQtde", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "consumoValor", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "entradaQtde", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "entradaValor", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "valorDeReferencia", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    {
+                        data: "materialBloqueado",
+                        render: function (data, type, material, td) {
+
+                            if (material.materialBloqueado) {
+
+                                return "x";
+                            }
+
+
+                            return null;
+
+
+                        }
+                    },
+                    { data: "materialSubstituto" },
+
+                ],
+
+                scrollX: true,
+                scrollY: "300px",
+                scrollCollapse: true,
+                deferRender: true,
+                fixedColumns: {
+                    leftColumns: 2,
+
+                }, "createdRow": function (row, data, dataIndex) {
+                    if (data.materialBloqueado != false) {
+                        $(row).addClass('red');
+
+                    }
+
+
+                }
+
+
+
+
+            })
+
+            //new $.fn.dataTable.FixedColumns(tabela, {
+
+            //        leftColumns: 2
+
+            //});
+
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = "none"
+
+        }
+
+
+        function AtualizaSpans() {
+            var estoque = 0;
+            var consumo = 0;
+            var entrada = 0;
+            //rst = new Array();
+            $.ajax({
+                type: 'GET',
+                data: {
+                    dto
+                },
+                url: "/api/MiniImpaqs/ListaMiniImpaq",
+                dataSrc: "",
+                success: function (d) {
+
+                    for (i = 0; i < d.length; i++) {
+                        estoque = estoque + d[i].fisicoValor
+                        consumo = consumo + d[i].consumoValor
+                        entrada = entrada + d[i].entradaValor
+                    }
+
+                    //var z =
+                    $('#spanEstoque')[0].textContent = 'R$ ' + parseFloat(estoque.toFixed(2)).toLocaleString('pt-BR')
+
+                    $('#spanConsumo')[0].textContent = 'R$ ' + parseFloat(consumo.toFixed(2)).toLocaleString('pt-BR')
+
+                    $('#spanEntrada')[0].textContent = 'R$ ' + parseFloat(entrada.toFixed(2)).toLocaleString('pt-BR')
+
+
+                }
+
+            })
+
+
+        }
+
+        //function OcultaCampos()
+        //{
+        //    tabela.column(2).visible(false)
+        //    tabela.column(3).visible(false)
+        //    tabela.column(4).visible(false)
+        //    tabela.column(5).visible(false)
+        //    tabela.column(6).visible(false)
+        //    tabela.column(7).visible(false)
+        //    tabela.column(8).visible(false)
+        //    tabela.column(9).visible(false)
+        //}
+
+
+        $(document).ready(function () {
+              brazil = @User.IsInRole(RoleName.Brazil).ToString().ToLower()
+            CarregaCabecalho();
+            AtualizaSpans();
+
+            $('.demo-default').on("change", function () {
+                var imgm = $('#imagemLoad')[0]
+                imgm.style.display = ""
+
+                CarregaCabecalho()
+                AtualizaSpans()
+            });
+
+            $('#btn_exporta').on('click', function () {
+                var botao = $('#btn_exporta')[0]
+                var imagem = $('#imagemLoad')[0]
+                imagem.style.display = ""
+                botao.style.visibility = 'hidden'
+
+                $.ajax({
+                    type: 'GET',
+                    data: {
+                        dto
+                    },
+                    url: "/api/MiniImpaqs/ListaMiniImpaq",
+                    dataSrc: "",
+                    success: function (d) {
+
+                        ExportaPagina(d);
+
+
+                    }
+
+                })
+
+            });
+
+
+        });
+
+
+
+
+    </script>
+
+
+}

@@ -1,0 +1,183 @@
+﻿@model SARCEM_TCC.web.ViewModels.DemandaPlmViewModel
+
+
+@{
+    ViewBag.Title = "Demanda de Materiais PLM";
+}
+
+<h2>Preencimento das @ViewBag.Title</h2>
+
+@*<div style="margin-top:2%">
+
+    <div class="form-group">
+
+        <label class="control-label"> Carregue aqui sua demanda.</label>
+        <textarea id="txt_Demanda2" rows="3" class="form-control">
+
+</textarea>
+    </div>
+</div>*@
+
+
+<style>
+    .DTFC_LeftBodyLiner {
+        top: -12px !important;
+    }
+</style>
+  
+
+    <hr />
+    @Html.ValidationSummary(true, "Por favor corrija os erros sinalizados")
+
+<div class="form-group" id="form">
+    @Html.LabelFor(m => m.Clipboard, new { @class = "col-md-2 control-label" })
+    <div class="col-md-6">
+        @Html.TextAreaFor(m => m.Clipboard, new
+   {
+       @class = "form-control",
+       @Rows = "4",
+       @id = "txt_Demanda"
+   })
+        @Html.ValidationMessageFor(m => m.Clipboard)
+
+    </div>
+</div>
+
+<div id="divCarga">   </div>
+
+
+
+@section scripts
+{
+    <script>
+        var carga;
+        var resultado;
+
+        function CarregaDataTable(resultado) {
+
+            var sb = $('#divCarga')
+            sb.html('');
+            sb.append("<table id='cargaTable' class='table table- striped text- nowrap table- hover'>" +
+                "  <thead > <tr>" +
+
+                
+                "   <th>Centro Logístico</th> " +
+                "   <th>Material            </th> " +
+                "   <th>Descrição           </th> " +
+                "   <th>Classe              </th> " +
+                "   <th>Unidade de Medida   </th> " +
+                "   <th>Classificação       </th> " +
+                "   <th>Família             </th> " +
+                "   <th>MG Code             </th> " +
+                "   <th>MG Code Descrição   </th> " +
+                "   <th>Projeto              </th> " +
+                "   <th>Informação Adicional</th> " +
+                "   <th>Responsável</th> " +
+                "   <th>Data para Atendimento         </th> " +
+                "   <th>Quantidade Pedida</th> " +
+                "   <th>Quantidade Pedida em R$ </th> " +
+
+                " </tr> </thead > <tbody> </tbody> </table >"
+            );
+
+            var tabela = $("#cargaTable").DataTable({
+
+                data: resultado,
+                columns: [
+
+                
+                    { data: "centroLogisticoCodSap" },
+                    { data: "materialCodSap" },
+                    { data: "materialDescricao" },
+                    { data: "materialClasse" },
+                    { data: "materialUM" },
+                    { data: "classificacaoNome" },
+                    { data: "familiaNome" },
+                    { data: "mGCodeCodigoSap" },
+                    { data: "mGCodeDescricao" },
+                    { data: "plmProjeto" },
+                    { data: "plmInfoAdicional" },
+                    { data: "plmResponsavel" },
+                    {
+                        data: "dataParaAtendimento", render:
+                            function (data, type, row) {
+                                return (data.substring(0, 10));
+                            } },
+                    { data: "plmQuantidade", render: $.fn.dataTable.render.number('.', ',', 2)  },
+                    { data: "plmQuantidadeEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+
+
+                ],
+
+                "scrollX": true,
+                "scrollY": "360px",
+                "scrollCollapse": true,
+                "deferRender": true,
+                "fixedColumns": {
+                    leftColumns: 2,
+                },
+
+
+            })
+
+            //var imgm = $('#imagemLoad')[0]
+            //imgm.style.display = "none"
+        }
+
+
+
+        $(document).ready(function () {
+            $('#txt_Demanda').on("keyup", function () {
+                carga = this.value
+                if (carga != "")
+                    //$.ajax({
+                    //    type: 'GET',
+                    //    data: {
+                    //        clipboard: carga
+
+                    //    },
+                    //    url: '/api/demandaPlms/ListaCarga',
+                    //    dataSrc: "",
+                    //    success: function (d) {
+
+                    //        //cabecalho = d;
+                    //        //CriaDropDowm(cabecalho);
+                    //        alert('')
+
+                    //    },
+                    //    datatype: 'json'
+
+                    //});
+                    // alert("Carregou")
+                    var imgm = $('#imagemLoad')[0];
+                var area = $('#form')[0];
+                area.style.display = "none";
+                imgm.style.display = "";
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            clipboard: carga
+
+                        },
+                        url: '/demandaPlm/Carga1',
+                        dataSrc: "",
+                        success: function (d) {
+                            resultado = d
+
+                            $('#txt_Demanda')[0].value = "";
+                            //area.style.display = "";
+                            CarregaDataTable(resultado);
+                            imgm.style.display = "none";
+                           
+                        },
+                        datatype: 'json'
+
+                    });
+
+
+            })
+        })
+    </script>
+
+}
+

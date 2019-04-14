@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SARCEM_TCC.web.Models.Domain;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SARCEM_TCC.web.Models
@@ -49,21 +50,30 @@ namespace SARCEM_TCC.web.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "Email")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "BR")]
+        public string UserBr { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Senha")]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
+        [Display(Name = "Lembrar login?")]
         public bool RememberMe { get; set; }
     }
 
+
     public class RegisterViewModel
     {
+        [Required]
+        [Display(Name = "Nome")]
+        public string UserName { get; set; }
+
+        [Required]
+        [Display(Name = "BR")]
+        public string UserBr { get; set; }
+
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
@@ -72,14 +82,26 @@ namespace SARCEM_TCC.web.Models
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Senha")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Confirme a Senha")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+
+        [Display(Name = "Selecione a Empresa")]
+        public long EmpresaID { get; set; }
+
+        //[Display(Name = "Selecione a Atividade")]
+        //public int UsuarioLogisticaAtividadeID { get; set; }
+
+        public virtual List<Empresa> Empresas { get; set; }
+       // public virtual List<UsuarioLogisticaAtividade> UsuarioLogisticaAtividades { get; set; }
     }
+
+
 
     public class ResetPasswordViewModel
     {
@@ -91,11 +113,11 @@ namespace SARCEM_TCC.web.Models
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Senha")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
+        [Display(Name = "Confirme a Senha")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 

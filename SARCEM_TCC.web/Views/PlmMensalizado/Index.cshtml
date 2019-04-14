@@ -1,0 +1,1710 @@
+﻿@using SARCEM_TCC.web.Models
+@using Microsoft.AspNet.Identity
+@using SARCEM_TCC.web.Helper
+@{
+    ViewBag.Title = "PLM";
+}
+
+
+
+
+
+<div style="float:left">
+
+    <h2>Informações de PLM</h2>
+    <h4>Planejamento Logístico de Materiais</h4>
+    <h6>Última atualização do usuário em  @ViewBag.data</h6>
+</div>
+
+<div style="float:right;margin-top: 2%;padding-right: 2%;">
+
+    <h5 id="headerEmpresa"> <span id="spanEmpresa"></span></h5>
+
+    <h5 id="headerDiretoria"><span id="spanDiretoria"></span></h5>
+
+    <h5 id="headeSubDiretoria"><span id="spanSubDiretoria"></span></h5>
+
+</div>
+
+@{
+    string dropdow = ControlaAcesso.TrazDropDown(User);
+
+}
+<div class="row">
+
+
+
+    <div id="DropDownsContainer" style="margin-top:1%">
+
+        @Html.Partial(dropdow)
+
+    </div>
+</div>
+
+<div class="container">
+
+
+    <div id="RadioContainer">
+        <div style="margin-top: 2%;">
+            @Html.Partial("_RadiosB")
+        </div>
+    </div>
+    <div class="col-lg-12 ">
+        <div style="margin-top: 2%;">
+            <div class="pull-left">
+                <div id="divAnoAnterior">
+
+                    <input class="checkbox" type="checkbox" name="historicoLY" value="historicoLY" style="float:left" />
+                    Histórico do ano de  <span id="anoAnterior"></span>
+
+                </div>
+                <div id="divAnoAtual">
+
+                    <input class="checkbox" type="checkbox" name="historico" value="historico" style="float:left" />
+                    Histórico (Desde o início do ano de <span id="anoAtual"></span> )
+
+                </div>
+
+            </div>
+
+
+            <div class="pull-right">
+                <button id="btn_exporta" class="btn btn-default xlsx">Exporte para Excel</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="col-lg-12" style="margin-top:2%;">
+
+    <style>
+        th {
+            text-align: center;
+        }
+
+        .DTFC_LeftBodyLiner {
+            top: -12px !important;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 3px;
+        }
+    </style>
+    <div id="divPlm">
+    </div>
+
+
+</div>
+
+
+@section scripts
+{
+    <script>
+
+        var brazil
+
+        var cabecalho
+        var dto
+        var tipoRetorno
+        var hist = false
+        var histLY = false
+
+        var mes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+        var data;
+        var labelMes;
+        data = new Date();
+        AnoAtual = data.getFullYear(mes[data.getMonth()] + '-' + data.getFullYear());
+
+
+
+
+
+
+        function CarregaCabecalho() {
+
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = ""
+
+            dto = {
+                Empresa: $('#listaEmpresa').val(),
+                Centro: $('#listaCentro').val(),
+                Gestor: $('#listaGestor').val(),
+                Familia: $('#listaFamilia').val(),
+                Material: $('#listaMaterial').val(),
+                Diretoria: $('#listaDiretoria').val(),
+                SubDiretoria: $('#listaSubDiretoria').val(),
+
+            }
+
+            tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+            hist = $('.checkbox')[1].checked
+            histLY = $('.checkbox')[0].checked
+
+            cabecalho = '';
+            cabecalho = new Array();
+
+            $.ajax({
+                type: 'GET',
+                data: {
+                    dto,
+                    historico: hist,
+                    historicoLY: histLY
+
+                },
+                url: '/api/PlmMensalizados/TrazDropDown',
+                dataSrc: "",
+                success: function (d) {
+
+                    cabecalho = d;
+                    CriaDropDowm(cabecalho);
+
+                },
+                datatype: 'json'
+
+            });
+
+
+        }
+
+        function AjustaLabelData(hist) {
+            data = new Date();
+
+            if (histLY) {
+
+                labelMes = new Array();
+                labelMes.push(mes[0] + '-' + (AnoAtual - 1))
+
+                for (i = 1; i <= 11; i++) {
+
+                    labelMes.push(mes[i] + '-' + (AnoAtual - 1))
+                }
+            }
+            else {
+                if (hist) {
+
+                    labelMes = new Array();
+                    labelMes.push(mes[0] + '-' + AnoAtual)
+
+                    for (i = 1; i <= 11; i++) {
+
+                        labelMes.push(mes[i] + '-' + AnoAtual)
+                    }
+                } else {
+
+                    data = new Date();
+                    if (data.getUTCDate() === 31) {
+                        data.setDate(data.getDate() - 10)
+                    }
+                    labelMes = new Array();
+                    labelMes.push(mes[data.getUTCMonth()] + '-' + data.getFullYear())
+
+                    for (i = 1; i <= 11; i++) {
+                        data.setMonth(data.getUTCMonth() + 1)
+
+                        labelMes.push(mes[data.getUTCMonth()] + '-' + data.getFullYear())
+                    }
+                }
+
+
+            }
+        }
+
+        function CriaDropDowm(cabecalho) {
+
+            if (cabecalho.empresas.length === 1) {
+
+                $('#spanEmpresa')[0].textContent = cabecalho.empresas[0]
+                dto.Empresa = cabecalho.empresas[0]
+            }
+            else
+                $('#spanEmpresa')[0].textContent = ""
+
+            if (cabecalho.diretorias.length === 1) {
+
+                $('#spanDiretoria')[0].textContent = cabecalho.diretorias[0]
+                dto.Diretoria =  cabecalho.diretorias[0]
+            }
+            else
+                $('#spanDiretoria')[0].textContent = ""
+
+            if (cabecalho.subDiretorias.length === 1) {
+
+                $('#spanSubDiretoria')[0].textContent = cabecalho.subDiretorias[0]
+                dto.SubDiretoria = cabecalho.subDiretorias[0]
+            }
+            else
+                $('#spanSubDiretoria')[0].textContent = ""
+
+
+
+                $('#listaEmpresa').html('');
+
+                if (dto.Empresa === '') {
+                    $('#listaEmpresa').append("<option value=''></option>");
+                    cabecalho.empresas.forEach(function (e) {
+                        $('#listaEmpresa').append("<option value='" + e + "'>" + e + "</option>");
+                    });
+
+                } else {
+                    $('#listaEmpresa').append("<option value='" + dto.Empresa + "' selected>" + dto.Empresa + "</option>");
+                  //  $('#listaEmpresa').append("<option value='' ></option>");
+
+                }
+
+
+
+
+
+            $('#listaDiretoria').html('');
+
+            if (dto.Diretoria === '') {
+                $('#listaDiretoria').append("<option value=''></option>");
+                cabecalho.diretorias.forEach(function (e) {
+                    $('#listaDiretoria').append("<option value='" + e + "'>" + e + "</option>");
+
+                });
+            } else {
+                $('#listaDiretoria').append("<option value='" + dto.Diretoria + "' selected>" + dto.Diretoria + "</option>");
+              //  $('#listaDiretoria').append("<option value=''></option>");
+            }
+
+
+            $('#listaSubDiretoria').html('');
+            if (dto.SubDiretoria === '') {
+                $('#listaSubDiretoria').append("<option value=''></option>");
+                cabecalho.subDiretorias.forEach(function (e) {
+                    $('#listaSubDiretoria').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaSubDiretoria').append("<option value='" + dto.SubDiretoria + "' selected>" + dto.SubDiretoria + "</option>");
+             //   $('#listaSubDiretoria').append("<option value=''></option>");
+            }
+
+
+            $('#listaCentro').html('');
+            if (dto.Centro === '') {
+                $('#listaCentro').append("<option value=''></option>");
+                cabecalho.centros.forEach(function (e) {
+                    $('#listaCentro').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaCentro').append("<option value='" + dto.Centro + "' selected>" + dto.Centro + "</option>");
+                $('#listaCentro').append("<option value=''></option>");
+            }
+
+
+
+            $('#listaMaterial').html('');
+            if (dto.Material === '') {
+                $('#listaMaterial').append("<option value=''></option>");
+                cabecalho.materiais.forEach(function (e) {
+                    $('#listaMaterial').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaMaterial').append("<option value='" + dto.Material + "'selected>" + dto.Material + "</option>");
+                $('#listaMaterial').append("<option value=''></option>");
+            }
+
+
+            $('#listaFamilia').html('');
+            if (dto.Familia === '') {
+                $('#listaFamilia').append("<option value=''></option>");
+                cabecalho.familias.forEach(function (e) {
+                    $('#listaFamilia').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaFamilia').append("<option value='" + dto.Familia + "'selected>" + dto.Familia + "</option>");
+                $('#listaFamilia').append("<option value=''></option>");
+            }
+
+            $('#listaGestor').html('');
+            if (dto.Gestor === '') {
+                $('#listaGestor').append("<option value=''></option>");
+                cabecalho.gestores.forEach(function (e) {
+                    $('#listaGestor').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaGestor').append("<option value='" + dto.Gestor + "' selected>" + dto.Gestor + "</option>");
+                $('#listaGestor').append("<option value=''></option>");
+            }
+
+
+
+
+            $('#listaEmpresa').select2({
+                theme: "classic",
+                placeholder: "Selecione a Empresa",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+            $('#listaDiretoria').select2({
+                theme: "classic",
+                placeholder: "Selecione a Diretoria",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+
+            $('#listaSubDiretoria').select2({
+                theme: "classic",
+                placeholder: "Selecione Macro Processo",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+            $('#listaCentro').select2({
+                theme: "classic",
+                placeholder: "Selecione o Centro",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+
+            $('#listaMaterial').select2({
+                theme: "classic",
+                placeholder: "Selecione o Material",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaFamilia').select2({
+                theme: "classic",
+                placeholder: "Selecione a Família",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaGestor').select2({
+                theme: "classic",
+                placeholder: "Selecione o Gestor",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+            var estilo = $('.select2');
+
+            for (var i = 0; i < estilo.length; i++) {
+                estilo[i].style.width = '100%';
+            }
+
+            criaTabela();
+
+        }
+
+        function criaTabela() {
+
+
+            AjustaLabelData(hist)
+
+            var sb = $('#divPlm')
+
+
+
+
+            sb.html('');
+
+            switch (tipoRetorno) {
+
+                case 'porCentro':
+                    {
+                        sb.append("<table id='tabelaPLM' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th>" +
+                            " <th>Centro       </th>" +
+                            " <th>Material      </th>" +
+                            " <th>Descrição    </th>" +
+                            " <th>Unidade de Medida</th>" +
+                            " <th>Classe       </th>" +
+                            " <th>Classificação</th>" +
+                            " <th>MG Cocde      </th>" +
+                            " <th>Gestor       </th>" +
+                            //  " <th>Data da Atualização    </th>" +
+                            " <th>Média dos próximos 12 meses  </th>" +
+                            " <th>Média dos próximos 12 meses em R$  </th>" +
+                            " <th>Total dos próximos 12 meses  </th>" +
+                            " <th>Total dos próximos 12 meses em R$ </th>" +
+                            " <th>" + labelMes[0] + "         </th>" +
+                            " <th>" + labelMes[1] + "         </th>" +
+                            " <th>" + labelMes[2] + "         </th>" +
+                            " <th>" + labelMes[3] + "         </th>" +
+                            " <th>" + labelMes[4] + "         </th>" +
+                            " <th>" + labelMes[5] + "         </th>" +
+                            " <th>" + labelMes[6] + "         </th>" +
+                            " <th>" + labelMes[7] + "         </th>" +
+                            " <th>" + labelMes[8] + "         </th>" +
+                            " <th>" + labelMes[9] + "         </th>" +
+                            " <th>" + labelMes[10] + "         </th>" +
+                            " <th>" + labelMes[11] + "         </th>" +
+
+                            "   <th>Material Bloqueado</th> " +
+                            "   <th>Material Substituido</th> " +
+
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaPLM").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+
+                                    dto,
+                                    tipoC: tipoRetorno,
+                                    historico: hist,
+                                    historicoLY: histLY
+
+                                },
+                                url: '/api/PlmMensalizados/ListaPlm',
+                                dataSrc: ""
+                            },
+                            columns: [
+
+                                { data: "empresa" },
+                                { data: "centro" },
+                                { data: "materia" },
+                                { data: "descricao" },
+                                { data: "um" },
+                                { data: "classe" },
+                                { data: "classificacao" },
+                                { data: "mgCocde" },
+                                { data: "gestor" },
+                                // { data: "plmDataLanc" },
+                                { data: "media", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mediaEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "total", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "totalEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "mes1", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                {
+                                    data: "materialBloqueado",
+                                    render: function (data, type, material, td) {
+
+                                        if (material.materialBloqueado) {
+
+                                            return "x";
+                                        }
+
+
+                                        return null;
+
+
+                                    }
+                                },
+                                { data: "materialSubstituto" },
+
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "300px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 3,
+                            },
+                            "createdRow": function (row, data, dataIndex) {
+                                if (data.materialBloqueado != false) {
+                                    $(row).addClass('red');
+
+                                }
+
+
+                            }
+                        });
+
+                        break;
+                    }
+
+                case 'porDiretoria':
+                    {
+
+                        sb.append("<table id='tabelaPLM' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th>" +
+                            " <th>Centro       </th>" +
+                            " <th>Material      </th>" +
+                            " <th>Descrição    </th>" +
+                            " <th>Unidade de Medida</th>" +
+                            " <th>Classe       </th>" +
+                            " <th>Classificação</th>" +
+                            " <th>MG Cocde      </th>" +
+                            " <th>Gestor       </th>" +
+                            " <th>Diretoria    </th>" +
+                            // " <th>Data da Atualização    </th>" +
+                            " <th>Média dos próximos 12 meses  </th>" +
+                            " <th>Média dos próximos 12 meses em R$  </th>" +
+                            " <th>Total dos próximos 12 meses  </th>" +
+                            " <th>Total dos próximos 12 meses em R$ </th>" +
+                            " <th>" + labelMes[0] + "         </th>" +
+                            " <th>" + labelMes[1] + "         </th>" +
+                            " <th>" + labelMes[2] + "         </th>" +
+                            " <th>" + labelMes[3] + "         </th>" +
+                            " <th>" + labelMes[4] + "         </th>" +
+                            " <th>" + labelMes[5] + "         </th>" +
+                            " <th>" + labelMes[6] + "         </th>" +
+                            " <th>" + labelMes[7] + "         </th>" +
+                            " <th>" + labelMes[8] + "         </th>" +
+                            " <th>" + labelMes[9] + "         </th>" +
+                            " <th>" + labelMes[10] + "         </th>" +
+                            " <th>" + labelMes[11] + "         </th>" +
+
+
+                            "   <th>Material Bloqueado</th> " +
+                            "   <th>Material Substituido</th> " +
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaPLM").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+                                    dto,
+                                    tipoC: tipoRetorno,
+                                    historico: hist,
+                                    historicoLY: histLY
+
+                                },
+                                url: '/api/PlmMensalizados/ListaPlm',
+                                dataSrc: "",
+                            },
+                            columns: [
+
+                                { data: "empresa" },
+                                { data: "centro" },
+                                { data: "materia" },
+                                { data: "descricao" },
+                                { data: "um" },
+                                { data: "classe" },
+
+                                { data: "classificacao" },
+                                { data: "mgCocde" },
+                                { data: "gestor" },
+                                { data: "diretoria" },
+                                // { data: "plmDataLanc" },
+                                { data: "media", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mediaEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "total", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "totalEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "mes1", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                {
+                                    data: "materialBloqueado",
+                                    render: function (data, type, material, td) {
+
+                                        if (material.materialBloqueado) {
+
+                                            return "x";
+                                        }
+
+
+                                        return null;
+
+
+                                    }
+                                },
+                                { data: "materialSubstituto" },
+
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "300px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 3,
+                            }, "createdRow": function (row, data, dataIndex) {
+                                if (data.materialBloqueado != false) {
+                                    $(row).addClass('red');
+
+                                }
+
+
+                            }
+
+                        });
+
+                        break;
+
+                    }
+
+
+                case 'porSubDiretoria':
+                    {
+                        sb.append("<table id='tabelaPLM' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th>" +
+                            " <th>Centro       </th>" +
+                            " <th>Material      </th>" +
+                            " <th>Descrição    </th>" +
+                            " <th>Unidade de Medida</th>" +
+                            " <th>Classe       </th>" +
+
+                            " <th>Classificação</th>" +
+                            " <th>MG Cocde      </th>" +
+                            " <th>Gestor       </th>" +
+                            " <th>Diretoria    </th>" +
+                            " <th>Macro Processo </th>" +
+                            // " <th>Data da Atualização    </th>" +
+                            " <th>Média dos próximos 12 meses  </th>" +
+                            " <th>Média dos próximos 12 meses em R$  </th>" +
+                            " <th>Total dos próximos 12 meses  </th>" +
+                            " <th>Total dos próximos 12 meses em R$ </th>" +
+                            " <th>" + labelMes[0] + "         </th>" +
+                            " <th>" + labelMes[1] + "         </th>" +
+                            " <th>" + labelMes[2] + "         </th>" +
+                            " <th>" + labelMes[3] + "         </th>" +
+                            " <th>" + labelMes[4] + "         </th>" +
+                            " <th>" + labelMes[5] + "         </th>" +
+                            " <th>" + labelMes[6] + "         </th>" +
+                            " <th>" + labelMes[7] + "         </th>" +
+                            " <th>" + labelMes[8] + "         </th>" +
+                            " <th>" + labelMes[9] + "         </th>" +
+                            " <th>" + labelMes[10] + "         </th>" +
+                            " <th>" + labelMes[11] + "         </th>" +
+
+
+                            "   <th>Material Bloqueado</th> " +
+                            "   <th>Material Substituido</th> " +
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaPLM").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+
+                                    dto,
+                                    tipoC: tipoRetorno,
+
+                                    historico: hist,
+                                    historicoLY: histLY
+
+
+                                },
+                                url: '/api/PlmMensalizados/ListaPlm',
+                                dataSrc: ""
+                            },
+                            columns: [
+
+                                { data: "empresa" },
+                                { data: "centro" },
+                                { data: "materia" },
+                                { data: "descricao" },
+                                { data: "um" },
+                                { data: "classe" },
+
+                                { data: "classificacao" },
+                                { data: "mgCocde" },
+                                { data: "gestor" },
+                                { data: "diretoria" },
+                                { data: "subDiretoria" },
+                                //  { data: "plmDataLanc" },
+                                { data: "media", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mediaEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "total", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "totalEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "mes1", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                {
+                                    data: "materialBloqueado",
+                                    render: function (data, type, material, td) {
+
+                                        if (material.materialBloqueado) {
+
+                                            return "x";
+                                        }
+
+
+                                        return null;
+
+
+                                    }
+                                },
+                                { data: "materialSubstituto" },
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "300px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 3,
+                            }, "createdRow": function (row, data, dataIndex) {
+                                if (data.materialBloqueado != false) {
+                                    $(row).addClass('red');
+
+                                }
+
+
+                            }
+
+                        });
+                        break;
+                    }
+
+                case 'porProjeto':
+                    {
+                        sb.append("<table id='tabelaPLM' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th>" +
+                            " <th>Centro       </th>" +
+                            " <th>Material      </th>" +
+                            " <th>Descrição    </th>" +
+                            " <th>Unidade de Medida</th>" +
+                            " <th>Classe       </th>" +
+
+                            " <th>Classificação</th>" +
+                            " <th>MG Cocde      </th>" +
+                            " <th>Gestor       </th>" +
+                            " <th>Diretoria    </th>" +
+                            " <th>Macro Processo </th>" +
+                            " <th>Projeto</th>" +
+                            " <th>Informações Adicionais</th>" +
+                            " <th>Responsável </th>" +
+                            // " <th>Data da Atualização    </th>" +
+                            " <th>Média dos próximos 12 meses  </th>" +
+                            " <th>Média dos próximos 12 meses em R$  </th>" +
+                            " <th>Total dos próximos 12 meses  </th>" +
+                            " <th>Total dos próximos 12 meses em R$ </th>" +
+                            " <th>" + labelMes[0] + "         </th>" +
+                            " <th>" + labelMes[1] + "         </th>" +
+                            " <th>" + labelMes[2] + "         </th>" +
+                            " <th>" + labelMes[3] + "         </th>" +
+                            " <th>" + labelMes[4] + "         </th>" +
+                            " <th>" + labelMes[5] + "         </th>" +
+                            " <th>" + labelMes[6] + "         </th>" +
+                            " <th>" + labelMes[7] + "         </th>" +
+                            " <th>" + labelMes[8] + "         </th>" +
+                            " <th>" + labelMes[9] + "         </th>" +
+                            " <th>" + labelMes[10] + "         </th>" +
+                            " <th>" + labelMes[11] + "         </th>" +
+
+
+                            "   <th>Material Bloqueado</th> " +
+                            "   <th>Material Substituido</th> " +
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaPLM").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+
+                                    dto,
+                                    tipoC: tipoRetorno,
+                                    historico: hist,
+                                    historicoLY: histLY
+
+                                },
+                                url: '/api/PlmMensalizados/ListaPlm',
+                                dataSrc: ""
+                            },
+                            columns: [
+
+                                { data: "empresa" },
+                                { data: "centro" },
+                                { data: "materia" },
+                                { data: "descricao" },
+                                { data: "um" },
+                                { data: "classe" },
+                                { data: "classificacao" },
+                                { data: "mgCocde" },
+                                { data: "gestor" },
+                                { data: "diretoria" },
+                                { data: "subDiretoria" },
+                                { data: "projeto" },
+                                { data: "infoAdicional" },
+                                { data: "responsavel" },
+                                //   { data: "plmDataLanc" },
+                                { data: "media", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mediaEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "total", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "totalEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "mes1", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                {
+                                    data: "materialBloqueado",
+                                    render: function (data, type, material, td) {
+
+                                        if (material.materialBloqueado) {
+
+                                            return "x";
+                                        }
+
+
+                                        return null;
+
+
+                                    }
+                                },
+                                { data: "materialSubstituto" },
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "300px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 3,
+                            }, "createdRow": function (row, data, dataIndex) {
+                                if (data.materialBloqueado != false) {
+                                    $(row).addClass('red');
+
+                                }
+
+
+                            }
+
+                        });
+                        break;
+                    }
+
+                case 'porResumo':
+                    {
+
+
+
+                        sb.append("<table id='tabelaPLM' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+
+                            " <th>Macro Processo </th>" +
+                            " <th>Total dos próximos 12 meses em R$  </th>" +
+                            " <th>Média dos próximos 12 meses em R$  </th>" +
+
+
+
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaPLM").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+                                    dto,
+                                    tipoC:
+                                        tipoRetorno,
+                                    historico: hist,
+                                    historicoLY: histLY
+                                },
+                                url: '/api/PlmMensalizados/ListaPlm',
+                                dataSrc: "",
+                            },
+                            columns: [
+
+                                { data: "subDiretoriaNome" },
+
+                                { data: "totalEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "mediaEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+
+
+                            ],
+
+                            "scrollX": false,
+                            "scrollY": "300px",
+                            "paging": false,
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+
+                        });
+
+                        break;
+                    }
+
+                default:
+                    {
+
+
+
+                        sb.append("<table id='tabelaPLM' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th>" +
+
+                            " <th>Material      </th>" +
+                            " <th>Descrição    </th>" +
+                            " <th>Unidade de Medida</th>" +
+                            " <th>Classe       </th>" +
+
+                            " <th>Classificação</th>" +
+                            " <th>MG Cocde      </th>" +
+                            " <th>Gestor       </th>" +
+
+                            //   " <th>Data da Atualização    </th>" +
+
+                            " <th>Média dos próximos 12 meses  </th>" +
+                            " <th>Média dos próximos 12 meses em R$  </th>" +
+                            " <th>Total dos próximos 12 meses  </th>" +
+                            " <th>Total dos próximos 12 meses em R$ </th>" +
+                            " <th>" + labelMes[0] + "         </th>" +
+                            " <th>" + labelMes[1] + "         </th>" +
+                            " <th>" + labelMes[2] + "         </th>" +
+                            " <th>" + labelMes[3] + "         </th>" +
+                            " <th>" + labelMes[4] + "         </th>" +
+                            " <th>" + labelMes[5] + "         </th>" +
+                            " <th>" + labelMes[6] + "         </th>" +
+                            " <th>" + labelMes[7] + "         </th>" +
+                            " <th>" + labelMes[8] + "         </th>" +
+                            " <th>" + labelMes[9] + "         </th>" +
+                            " <th>" + labelMes[10] + "         </th>" +
+                            " <th>" + labelMes[11] + "         </th>" +
+
+
+                            "   <th>Material Bloqueado</th> " +
+                            "   <th>Material Substituido</th> " +
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaPLM").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+                                    dto,
+                                    tipoC:
+                                        tipoRetorno,
+                                    historico: hist,
+                                    historicoLY: histLY
+                                },
+                                url: '/api/PlmMensalizados/ListaPlm',
+                                dataSrc: "",
+                            },
+                            columns: [
+
+                                { data: "empresa" },
+                                { data: "materia" },
+                                { data: "descricao" },
+                                { data: "um" },
+                                { data: "classe" },
+                                { data: "classificacao" },
+                                { data: "mgCocde" },
+                                { data: "gestor" },
+                                //  { data: "plmDataLanc" },
+                                { data: "media", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mediaEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "total", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "totalEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "mes1", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "mes12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                {
+                                    data: "materialBloqueado",
+                                    render: function (data, type, material, td) {
+
+                                        if (material.materialBloqueado) {
+
+                                            return "x";
+                                        }
+
+
+                                        return null;
+
+
+                                    }
+                                },
+                                { data: "materialSubstituto" },
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "300px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 2,
+                            }, "createdRow": function (row, data, dataIndex) {
+                                if (data.materialBloqueado != false) {
+                                    $(row).addClass('red');
+
+                                }
+
+
+                            }
+
+                        });
+
+                        break;
+                    }
+            }
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = "none"
+        }
+
+        function ExportaPagina(result) {
+            table = '';
+
+            dataRst = '';
+
+
+
+            dataRst = new Array();
+
+
+            var i = 1;
+
+
+            switch (tipoRetorno) {
+
+                case 'porCentro':
+                    {
+
+
+
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+                            { v: 'Centro', t: 's' },
+                            { v: 'Material', t: 's' },
+                            { v: 'Descrição', t: 's' },
+                            { v: 'Unidade de Medida', t: 's' },
+                            { v: 'Classe', t: 's' },
+
+                            { v: 'Classificação', t: 's' },
+                            { v: 'MG Cocde', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            { v: 'Data da Atualização', t: 's' },
+                            { v: 'Média em ' + AnoAtual, t: 's' },
+                            { v: 'Média em ' + AnoAtual + ' em R$', t: 's' },
+                            { v: 'Total em ' + AnoAtual, t: 's' },
+                            { v: 'Total em ' + AnoAtual + ' em R$', t: 's' },
+                            { v: labelMes[0], t: 's' },
+                            { v: labelMes[1], t: 's' },
+                            { v: labelMes[2], t: 's' },
+                            { v: labelMes[3], t: 's' },
+                            { v: labelMes[4], t: 's' },
+                            { v: labelMes[5], t: 's' },
+                            { v: labelMes[6], t: 's' },
+                            { v: labelMes[7], t: 's' },
+                            { v: labelMes[8], t: 's' },
+                            { v: labelMes[9], t: 's' },
+                            { v: labelMes[10], t: 's' },
+                            { v: labelMes[11], t: 's' },
+                            { v: 'Material Bloqueado', t: 's' },
+                            { v: 'Material Substituido', t: 's' },
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresa, t: 's' },
+                                { v: r.centro, t: 's' },
+                                { v: r.materia, t: 's' },
+                                { v: r.descricao, t: 's' },
+                                { v: r.um, t: 's' },
+                                { v: r.classe, t: 's' },
+
+                                { v: r.classificacao, t: 's' },
+                                { v: r.mgCocde, t: 's' },
+                                { v: r.gestor, t: 's' },
+                                { v: r.plmDataLanc, t: 'd' },
+                                { v: r.media, t: 'n' },
+                                { v: r.mediaEmReal, t: 'n' },
+                                { v: r.total, t: 'n' },
+                                { v: r.totalEmReal, t: 'n' },
+                                { v: r.mes1, t: 'n' },
+                                { v: r.mes2, t: 'n' },
+                                { v: r.mes3, t: 'n' },
+                                { v: r.mes4, t: 'n' },
+                                { v: r.mes5, t: 'n' },
+                                { v: r.mes6, t: 'n' },
+                                { v: r.mes7, t: 'n' },
+                                { v: r.mes8, t: 'n' },
+                                { v: r.mes9, t: 'n' },
+                                { v: r.mes10, t: 'n' },
+                                { v: r.mes11, t: 'n' },
+                                { v: r.mes12, t: 'n' },
+                                { v: r.materialBloqueado, t: 's' },
+                                { v: r.materialSubstituto, t: 's' },
+                            ];
+                            i++;
+                        });
+
+
+                        break;
+                    }
+
+                case 'porDiretoria':
+                    {
+
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+                            { v: 'Centro', t: 's' },
+                            { v: 'Material', t: 's' },
+                            { v: 'Descrição', t: 's' },
+                            { v: 'Unidade de Medida', t: 's' },
+                            { v: 'Classe', t: 's' },
+
+                            { v: 'Classificação', t: 's' },
+                            { v: 'MG Cocde', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            { v: 'Diretoria', t: 's' },
+                            { v: 'Data da Atualização', t: 's' },
+                            { v: 'Média dos próximos 12 meses', t: 's' },
+                            { v: 'Média dos próximos 12 meses em R$', t: 's' },
+                            { v: 'Total dos próximos 12 meses', t: 's' },
+                            { v: 'Total dos próximos 12 meses em R$', t: 's' },
+                            { v: labelMes[0], t: 's' },
+                            { v: labelMes[1], t: 's' },
+                            { v: labelMes[2], t: 's' },
+                            { v: labelMes[3], t: 's' },
+                            { v: labelMes[4], t: 's' },
+                            { v: labelMes[5], t: 's' },
+                            { v: labelMes[6], t: 's' },
+                            { v: labelMes[7], t: 's' },
+                            { v: labelMes[8], t: 's' },
+                            { v: labelMes[9], t: 's' },
+                            { v: labelMes[10], t: 's' },
+                            { v: labelMes[11], t: 's' },
+                            { v: 'Material Bloqueado', t: 's' },
+                            { v: 'Material Substituido', t: 's' },
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresa, t: 's' },
+                                { v: r.centro, t: 's' },
+                                { v: r.materia, t: 's' },
+                                { v: r.descricao, t: 's' },
+                                { v: r.um, t: 's' },
+                                { v: r.classe, t: 's' },
+
+                                { v: r.classificacao, t: 's' },
+                                { v: r.mgCocde, t: 's' },
+                                { v: r.gestor, t: 's' },
+                                { v: r.diretoria, t: 's' },
+                                { v: r.plmDataLanc, t: 'd' },
+                                { v: r.media, t: 'n' },
+                                { v: r.mediaEmReal, t: 'n' },
+                                { v: r.total, t: 'n' },
+                                { v: r.totalEmReal, t: 'n' },
+                                { v: r.mes1, t: 'n' },
+                                { v: r.mes2, t: 'n' },
+                                { v: r.mes3, t: 'n' },
+                                { v: r.mes4, t: 'n' },
+                                { v: r.mes5, t: 'n' },
+                                { v: r.mes6, t: 'n' },
+                                { v: r.mes7, t: 'n' },
+                                { v: r.mes8, t: 'n' },
+                                { v: r.mes9, t: 'n' },
+                                { v: r.mes10, t: 'n' },
+                                { v: r.mes11, t: 'n' },
+                                { v: r.mes12, t: 'n' },
+                                { v: r.materialBloqueado, t: 's' },
+                                { v: r.materialSubstituto, t: 's' },
+                            ];
+                            i++;
+                        });
+
+                        break;
+
+                    }
+
+
+                case 'porSubDiretoria':
+                    {
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+                            { v: 'Centro', t: 's' },
+                            { v: 'Material', t: 's' },
+                            { v: 'Descrição', t: 's' },
+                            { v: 'Unidade de Medida', t: 's' },
+                            { v: 'Classe', t: 's' },
+
+                            { v: 'Classificação', t: 's' },
+                            { v: 'MG Cocde', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            { v: 'Diretoria', t: 's' },
+                            { v: 'Macro Processo', t: 's' },
+                            { v: 'Data da Atualização', t: 's' },
+                            { v: 'Média dos próximos 12 meses', t: 's' },
+                            { v: 'Média dos próximos 12 meses em R$', t: 's' },
+                            { v: 'Total dos próximos 12 meses', t: 's' },
+                            { v: 'Total dos próximos 12 meses em R$', t: 's' },
+                            { v: labelMes[0], t: 's' },
+                            { v: labelMes[1], t: 's' },
+                            { v: labelMes[2], t: 's' },
+                            { v: labelMes[3], t: 's' },
+                            { v: labelMes[4], t: 's' },
+                            { v: labelMes[5], t: 's' },
+                            { v: labelMes[6], t: 's' },
+                            { v: labelMes[7], t: 's' },
+                            { v: labelMes[8], t: 's' },
+                            { v: labelMes[9], t: 's' },
+                            { v: labelMes[10], t: 's' },
+                            { v: labelMes[11], t: 's' },
+                            { v: 'Material Bloqueado', t: 's' },
+                            { v: 'Material Substituido', t: 's' },
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresa, t: 's' },
+                                { v: r.centro, t: 's' },
+                                { v: r.materia, t: 's' },
+                                { v: r.descricao, t: 's' },
+                                { v: r.um, t: 's' },
+                                { v: r.classe, t: 's' },
+
+                                { v: r.classificacao, t: 's' },
+                                { v: r.mgCocde, t: 's' },
+                                { v: r.gestor, t: 's' },
+                                { v: r.diretoria, t: 's' },
+                                { v: r.subDiretoria, t: 's' },
+                                { v: r.plmDataLanc, t: 'd' },
+                                { v: r.media, t: 'n' },
+                                { v: r.mediaEmReal, t: 'n' },
+                                { v: r.total, t: 'n' },
+                                { v: r.totalEmReal, t: 'n' },
+                                { v: r.mes1, t: 'n' },
+                                { v: r.mes2, t: 'n' },
+                                { v: r.mes3, t: 'n' },
+                                { v: r.mes4, t: 'n' },
+                                { v: r.mes5, t: 'n' },
+                                { v: r.mes6, t: 'n' },
+                                { v: r.mes7, t: 'n' },
+                                { v: r.mes8, t: 'n' },
+                                { v: r.mes9, t: 'n' },
+                                { v: r.mes10, t: 'n' },
+                                { v: r.mes11, t: 'n' },
+                                { v: r.mes12, t: 'n' },
+                                { v: r.materialBloqueado, t: 's' },
+                                { v: r.materialSubstituto, t: 's' }]
+                            i++;
+                        });
+                        break;
+                    }
+
+                case 'porProjeto':
+                    {
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+                            { v: 'Centro', t: 's' },
+                            { v: 'Material', t: 's' },
+                            { v: 'Descrição', t: 's' },
+                            { v: 'Unidade de Medida', t: 's' },
+                            { v: 'Classe', t: 's' },
+
+                            { v: 'Classificação', t: 's' },
+                            { v: 'MG Cocde', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            { v: 'Diretoria', t: 's' },
+                            { v: 'Macro Processo', t: 's' },
+                            { v: 'Projeto', t: 's' },
+                            { v: 'Informações Adicionais', t: 's' },
+                            { v: 'Responsável', t: 's' },
+                            { v: 'Data da Atualização', t: 's' },
+                            { v: 'Média dos próximos 12 meses', t: 's' },
+                            { v: 'Média dos próximos 12 meses em R$', t: 's' },
+                            { v: 'Total dos próximos 12 meses', t: 's' },
+                            { v: 'Total dos próximos 12 meses em R$', t: 's' },
+                            { v: labelMes[0], t: 's' },
+                            { v: labelMes[1], t: 's' },
+                            { v: labelMes[2], t: 's' },
+                            { v: labelMes[3], t: 's' },
+                            { v: labelMes[4], t: 's' },
+                            { v: labelMes[5], t: 's' },
+                            { v: labelMes[6], t: 's' },
+                            { v: labelMes[7], t: 's' },
+                            { v: labelMes[8], t: 's' },
+                            { v: labelMes[9], t: 's' },
+                            { v: labelMes[10], t: 's' },
+                            { v: labelMes[11], t: 's' },
+                            { v: 'Material Bloqueado', t: 's' },
+                            { v: 'Material Substituido', t: 's' },
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresa, t: 's' },
+                                { v: r.centro, t: 's' },
+                                { v: r.materia, t: 's' },
+                                { v: r.descricao, t: 's' },
+                                { v: r.um, t: 's' },
+                                { v: r.classe, t: 's' },
+
+                                { v: r.classificacao, t: 's' },
+                                { v: r.mgCocde, t: 's' },
+                                { v: r.gestor, t: 's' },
+                                { v: r.diretoria, t: 's' },
+                                { v: r.subDiretoria, t: 's' },
+                                { v: r.projeto, t: 's' },
+                                { v: r.infoAdicional, t: 's' },
+                                { v: r.responsavel, t: 's' },
+                                { v: r.plmDataLanc, t: 'd' },
+                                { v: r.media, t: 'n' },
+                                { v: r.mediaEmReal, t: 'n' },
+                                { v: r.total, t: 'n' },
+                                { v: r.totalEmReal, t: 'n' },
+                                { v: r.mes1, t: 'n' },
+                                { v: r.mes2, t: 'n' },
+                                { v: r.mes3, t: 'n' },
+                                { v: r.mes4, t: 'n' },
+                                { v: r.mes5, t: 'n' },
+                                { v: r.mes6, t: 'n' },
+                                { v: r.mes7, t: 'n' },
+                                { v: r.mes8, t: 'n' },
+                                { v: r.mes9, t: 'n' },
+                                { v: r.mes10, t: 'n' },
+                                { v: r.mes11, t: 'n' },
+                                { v: r.mes12, t: 'n' },
+                                { v: r.materialBloqueado, t: 's' },
+                                { v: r.materialSubstituto, t: 's' }];
+                            i++;
+                        });
+                        break;
+                    }
+
+
+                case 'porResumo':
+                    {
+                        dataRst[0] = [
+                            //{ v: 'Empresa', t: 's' },
+                            ////{ v: 'Centro', t: 's' },
+                            //{ v: 'Material', t: 's' },
+                            //{ v: 'Descrição', t: 's' },
+                            //{ v: 'Unidade de Medida', t: 's' },
+                            //{ v: 'Classe', t: 's' },
+
+                            //{ v: 'Classificação', t: 's' },
+                            //{ v: 'MG Cocde', t: 's' },
+                            //{ v: 'Gestor', t: 's' },
+                            ////{ v: 'Diretoria', t: 's' },
+                            //{ v: 'Data da Atualização', t: 's' },
+                            { v: 'Macro Processo', t: 's' },
+                            { v: 'Total dos próximos 12 meses em R$', t: 's' },
+                            { v: 'Média dos próximos 12 meses em R$', t: 's' },
+
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                //{ v: r.empresa, t: 's' },
+                                //{ v: r.materia, t: 's' },
+                                //{ v: r.descricao, t: 's' },
+                                //{ v: r.um, t: 's' },
+                                //{ v: r.classe, t: 's' },
+                                //{ v: r.classificacao, t: 's' },
+                                //{ v: r.mgCocde, t: 's' },
+                                //{ v: r.gestor, t: 's' },
+                                //{ v: r.plmDataLanc, t: 'd' },
+                                { v: r.subDiretoriaNome, t: 's' },
+                                { v: r.totalEmReal, t: 'n' },
+                                { v: r.mediaEmReal, t: 'n' },
+                            ];
+                            i++;
+                        });
+
+                        break;
+                    }
+
+                default:
+                    {
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+                            //{ v: 'Centro', t: 's' },
+                            { v: 'Material', t: 's' },
+                            { v: 'Descrição', t: 's' },
+                            { v: 'Unidade de Medida', t: 's' },
+                            { v: 'Classe', t: 's' },
+
+                            { v: 'Classificação', t: 's' },
+                            { v: 'MG Cocde', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            //{ v: 'Diretoria', t: 's' },
+                            { v: 'Data da Atualização', t: 's' },
+                            { v: 'Média dos próximos 12 meses', t: 's' },
+                            { v: 'Média dos próximos 12 meses em R$', t: 's' },
+                            { v: 'Total dos próximos 12 meses', t: 's' },
+                            { v: 'Total dos próximos 12 meses em R$', t: 's' },
+                            { v: labelMes[0], t: 's' },
+                            { v: labelMes[1], t: 's' },
+                            { v: labelMes[2], t: 's' },
+                            { v: labelMes[3], t: 's' },
+                            { v: labelMes[4], t: 's' },
+                            { v: labelMes[5], t: 's' },
+                            { v: labelMes[6], t: 's' },
+                            { v: labelMes[7], t: 's' },
+                            { v: labelMes[8], t: 's' },
+                            { v: labelMes[9], t: 's' },
+                            { v: labelMes[10], t: 's' },
+                            { v: labelMes[11], t: 's' },
+                            { v: 'Material Bloqueado', t: 's' },
+                            { v: 'Material Substituido', t: 's' },
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresa, t: 's' },
+                                { v: r.materia, t: 's' },
+                                { v: r.descricao, t: 's' },
+                                { v: r.um, t: 's' },
+                                { v: r.classe, t: 's' },
+                                { v: r.classificacao, t: 's' },
+                                { v: r.mgCocde, t: 's' },
+                                { v: r.gestor, t: 's' },
+                                { v: r.plmDataLanc, t: 'd' },
+                                { v: r.media, t: 'n' },
+                                { v: r.mediaEmReal, t: 'n' },
+                                { v: r.total, t: 'n' },
+                                { v: r.totalEmReal, t: 'n' },
+                                { v: r.mes1, t: 'n' },
+                                { v: r.mes2, t: 'n' },
+                                { v: r.mes3, t: 'n' },
+                                { v: r.mes4, t: 'n' },
+                                { v: r.mes5, t: 'n' },
+                                { v: r.mes6, t: 'n' },
+                                { v: r.mes7, t: 'n' },
+                                { v: r.mes8, t: 'n' },
+                                { v: r.mes9, t: 'n' },
+                                { v: r.mes10, t: 'n' },
+                                { v: r.mes11, t: 'n' },
+                                { v: r.mes12, t: 'n' },
+                                { v: r.materialBloqueado, t: 's' },
+                                { v: r.materialSubstituto, t: 's' }
+                            ];
+                            i++;
+                        });
+
+                        break;
+                    }
+            }
+
+            var table = $('#tabelaPLM').tableExport();
+            table.export2file(dataRst, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Extrato_PLM', '.xlsx')
+            var botao = $('#btn_exporta')[0]
+            var imagem = $('#imagemLoad')[0]
+            imagem.style.display = "none"
+            botao.style.visibility = "visible"
+
+        }
+
+
+
+
+
+
+
+        $(document).ready(function () {
+
+  brazil = @User.IsInRole(RoleName.Brazil).ToString().ToLower()
+
+            var ndata = new Date()
+
+            $('#anoAnterior')[0].innerText = ndata.getFullYear() - 1
+
+            $('#anoAtual')[0].innerText = ndata.getFullYear()
+            CarregaCabecalho();
+
+            $('.demo-default').on("change", function () {
+                CarregaCabecalho()
+            });
+
+            $('.radio').on('change', function () {
+                tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+                hist = $('.checkbox')[1].checked
+                histLY = $('.checkbox')[0].checked
+                criaTabela();
+
+            });
+
+            $('.checkbox').on('change', function () {
+                tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+
+                if ($('.checkbox')[1].checked) {
+                    $('#divAnoAnterior')[0].style.visibility = 'hidden';
+                }
+                else {
+                    $('#divAnoAnterior')[0].style.visibility = "initial";
+                }
+
+
+
+                if ($('.checkbox')[0].checked) {
+                    $('#divAnoAtual')[0].style.visibility = 'hidden';
+                }
+                else {
+                    $('#divAnoAtual')[0].style.visibility = "initial";
+                }
+
+                hist = $('.checkbox')[1].checked
+                histLY = $('.checkbox')[0].checked
+
+
+                criaTabela();
+
+            });
+
+            $('#btn_exporta').on('click', function () {
+                var botao = $('#btn_exporta')[0]
+                var imagem = $('#imagemLoad')[0]
+                imagem.style.display = ""
+                botao.style.visibility = 'hidden'
+                //$('#imagemLoad')
+                $.ajax({
+                    type: 'GET',
+                    data: {
+
+                        dto,
+                        tipoC: tipoRetorno,
+
+                        historico: hist,
+                        historicoLY: histLY
+
+                    },
+                    url: '/api/PlmMensalizados/ListaPlm',
+                    dataSrc: "",
+                    success: function (d) {
+
+                        ExportaPagina(d);
+
+
+                    }
+
+                })
+
+            });
+
+        });
+    </script>
+}
+
+
+@*
+    "empresa"
+    "centro"
+    "materia"
+    "descricao"
+    "um"
+    "classe"
+    "appia"
+    "classificacao"
+    "mgCocde"
+    "gestor"
+    "diretoria"
+    "subDiretoria"
+    "media"
+    "total"
+    "mes1"
+    "mes2"
+    "mes3"
+    "mes4"
+    "mes5"
+    "mes6"
+    "mes7"
+    "mes8"
+    "mes9"
+    "mes10"
+    "mes11"
+    "mes12"
+*@
+
+

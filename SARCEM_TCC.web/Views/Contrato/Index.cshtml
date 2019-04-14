@@ -1,0 +1,845 @@
+﻿@using SARCEM_TCC.web.Models
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "Contratos";
+}
+<div style="float:left">
+
+<h2>@ViewBag.Title</h2>
+<h4>Traz a listagem de contratos com saldo e vigência</h4>
+<h6>Informação atualizada em @ViewBag.data</h6>
+
+</div>
+
+
+<div style="float:right;margin-top: 2%;padding-right: 2%;">
+
+    <h5 id="headerEmpresa"> <span id="spanEmpresa"></span></h5>
+
+
+</div>
+
+@{
+    string dropdow = "";
+
+    if (User.IsInRole(RoleName.Brazil))
+    {
+        dropdow = "_DropDownsBrazil";
+    }
+    else
+    {
+
+        dropdow = "_DropDowns";
+    }
+
+
+}
+<div class="row">
+
+
+
+    <div id="DropDownsContainer" style="margin-top:1%">
+
+        @Html.Partial(dropdow)
+
+    </div>
+</div>
+
+
+<div class="container">
+
+
+
+
+    <div class="col-lg-12 " style="margin-top: 2%;">
+        <div id="RadioContainer">
+            <div>
+                @Html.Partial("_RadiosB")
+            </div>
+        </div>
+        <div>
+
+            <div class="pull-right">
+                <button id="btn_exporta" class="btn btn-default xlsx">Exporte para Excel</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div style="margin-top: 2%;">
+            <div class="col-lg-12">
+                <style>
+                    th {
+                        text-align: center;
+                    }
+
+                    .DTFC_LeftBodyLiner {
+                        top: -12px !important;
+                    }
+                </style>
+                <div id="divContrato">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts
+{
+    <script>
+        var cabecalho
+        var dto
+        var data
+        var tipoRetorno
+        var brazil
+
+        data = new Date();
+        AnoAtual = data.getFullYear();
+
+        function CarregaCabecalho() {
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = ""
+            dto = {
+                Empresa: $('#listaEmpresa').val(),
+                Contrato: $('#listaContrato').val(),
+                Material: $('#listaMaterial').val(),
+                Familia: $('#listaFamilia').val(),
+                Gestor: $('#listaGestor').val(),
+                Fornecedor: $('#listaFornecedor').val(),
+
+
+
+            }
+
+            tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+
+            cabecalho = '';
+            cabecalho = new Array();
+
+            $.ajax({
+                type: 'GET',
+                data: {
+                    dto
+                },
+                url: '/api/Contratos/TrazDropDown',
+                dataSrc: "",
+                success: function (d) {
+
+                    cabecalho = d;
+                    CriaDropDowm(cabecalho);
+
+                },
+                datatype: 'json'
+
+            });
+        }
+
+        function CriaDropDowm(cabecalho) {
+            if (cabecalho.empresas.length === 1)
+                $('#spanEmpresa')[0].textContent = cabecalho.empresas[0]
+            else
+                $('#spanEmpresa')[0].textContent = ""
+
+
+                $('#listaEmpresa').html('');
+
+                if (dto.Empresa === '') {
+                    $('#listaEmpresa').append("<option value=''></option>");
+                    cabecalho.empresas.forEach(function (e) {
+                        $('#listaEmpresa').append("<option value='" + e + "'>" + e + "</option>");
+                    });
+
+                } else {
+                    $('#listaEmpresa').append("<option value='" + dto.Empresa + "' selected>" + dto.Empresa + "</option>");
+                    $('#listaEmpresa').append("<option value='' ></option>");
+
+
+
+            }
+
+
+            $('#listaContrato').html('');
+
+            if (dto.Contrato === '') {
+                $('#listaContrato').append("<option value=''></option>");
+                cabecalho.contratos.forEach(function (e) {
+                    $('#listaContrato').append("<option value='" + e + "'>" + e + "</option>");
+                });
+
+            } else {
+                $('#listaContrato').append("<option value='" + dto.Contrato + "' selected>" + dto.Contrato + "</option>");
+                $('#listaContrato').append("<option value='' ></option>");
+
+            }
+
+
+            $('#listaMaterial').html('');
+            if (dto.Material === '') {
+                $('#listaMaterial').append("<option value=''></option>");
+                cabecalho.materiais.forEach(function (e) {
+                    $('#listaMaterial').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaMaterial').append("<option value='" + dto.Material + "'selected>" + dto.Material + "</option>");
+                $('#listaMaterial').append("<option value=''></option>");
+            }
+
+
+            $('#listaFamilia').html('');
+            if (dto.Familia === '') {
+                $('#listaFamilia').append("<option value=''></option>");
+                cabecalho.familias.forEach(function (e) {
+                    $('#listaFamilia').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaFamilia').append("<option value='" + dto.Familia + "'selected>" + dto.Familia + "</option>");
+                $('#listaFamilia').append("<option value=''></option>");
+            }
+
+            $('#listaGestor').html('');
+            if (dto.Gestor === '') {
+                $('#listaGestor').append("<option value=''></option>");
+                cabecalho.gestores.forEach(function (e) {
+                    $('#listaGestor').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaGestor').append("<option value='" + dto.Gestor + "' selected>" + dto.Gestor + "</option>");
+                $('#listaGestor').append("<option value=''></option>");
+            }
+
+
+            $('#listaFornecedor').html('');
+            if (dto.Fornecedor === '') {
+                $('#listaFornecedor').append("<option value=''></option>");
+                cabecalho.fornecedores.forEach(function (e) {
+                    $('#listaFornecedor').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaFornecedor').append("<option value='" + dto.Fornecedor + "' selected>" + dto.Fornecedor + "</option>");
+                $('#listaFornecedor').append("<option value=''></option>");
+            }
+
+
+
+
+
+
+            $('#listaEmpresa').select2({
+                theme: "classic",
+                placeholder: "Selecione a Empresa",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaContrato').select2({
+                theme: "classic",
+                placeholder: "Selecione o Contrato",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaMaterial').select2({
+                theme: "classic",
+                placeholder: "Selecione o Material",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaFamilia').select2({
+                theme: "classic",
+                placeholder: "Selecione a Família",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaGestor').select2({
+                theme: "classic",
+                placeholder: "Selecione o Gestor",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaFornecedor').select2({
+                theme: "classic",
+                placeholder: "Selecione o Fornecedor",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+
+            var estilo = $('.select2');
+
+            for (var i = 0; i < estilo.length; i++) {
+                estilo[i].style.width = '100%';
+            }
+
+
+
+
+            CarregaDataTable()
+
+        }
+
+        function ExportaPagina(result) {
+            table = '';
+
+            dataRst = '';
+
+
+
+            dataRst = new Array();
+
+
+            var i = 1;
+
+
+            switch (tipoRetorno) {
+
+
+                case 'porMaterial':
+                    {
+
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+                            { v: 'Contrato', t: 's' },
+                            { v: 'Item do Contrato', t: 's' },
+                            { v: 'Material', t: 's' },
+                            { v: 'Descricao do Material', t: 's' },
+                            { v: 'Família', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            { v: 'Data de Criação', t: 's' },
+                            { v: 'Início da Vigência', t: 's' },
+                            { v: 'Fim da Vigência', t: 's' },
+                            { v: 'Vigência inferior a 6 Meses?', t: 's' },
+                            { v: 'centro Logistico', t: 's' },
+                            { v: 'Qtde do Contrato', t: 's' },
+                            { v: 'Qtde Disponível', t: 's' },
+                            { v: '% Consumido do Material', t: 's' },
+                            { v: 'Mais de 75% do Item Consumido?', t: 's' },
+                            { v: 'Moeda', t: 's' },
+                            { v: 'Cotação', t: 's' },
+                            { v: 'Valor do Contrato', t: 's' },
+                            { v: 'Valor disponível no Contrato', t: 's' },
+                            { v: 'Valor disponível no Contrato em R$', t: 's' },
+                            { v: '% Consumido do Contrato', t: 's' },
+                            { v: 'Mais de 75% do Contrato Consumido?', t: 's' },
+                            { v: 'Fornecedor', t: 's' },
+                            // { v: 'Valor unitário do item', t: 's' },
+                            { v: 'Data da Informação', t: 's' },
+                            { v: 'status do Contrato', t: 's' },
+                            { v: 'Material Bloqueado', t: 's' },
+                            { v: 'Material Substituido', t: 's' },
+
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresaNome, t: 's' },
+                                { v: r.contratoNumero, t: 's' },
+                                { v: r.itemDoContratoItm, t: 's' },
+                                { v: r.materialCodSap, t: 's' },
+                                { v: r.materialDescricao, t: 's' },
+                                { v: r.familiaNome, t: 's' },
+                                { v: r.userName, t: 's' },
+                                { v: r.contratoDataDoc, t: 'd' },
+                                { v: r.contratoIniPrazo, t: 'd' },
+                                { v: r.contratoFimValidade, t: 'd' },
+                                { v: r.vigenciaMenorQue6Meses, t: 's' },
+                                { v: r.centroLogisticoCodSap, t: 's' },
+                                { v: r.itemDoContratoQtdeContrato, t: 'n' },
+                                { v: r.itemDoContratoQtdeDisp, t: 'n' },
+                                { v: r.percentualConsumidoMaterial, t: 'n' },
+                                { v: r.maisDe75PercentDoItemConsumido, t: 's' },
+                                { v: r.baseCotacaoSigla, t: 's' },
+                                { v: r.baseCotacaoValor, t: 'n' },
+                                { v: r.contratoValFixado, t: 'n' },
+                                { v: r.contratoValGlPend, t: 'n' },
+                                { v: r.contratoValGlPendEmReal, t: 'n' },
+                                { v: r.percentualConsumidoContrato, t: 'n' },
+                                { v: r.maisDe75PercentDoContratoConsumido, t: 's' },
+                                { v: r.fornecedorNome, t: 's' },
+                                // { v: r.valorDeReferencia, t: 'n' },
+                                { v: r.contratoDataAlteracao, t: 'd' },
+                                { v: r.statusDoContrato, t: 's' },
+                                { v: r.materialBloqueado, t: 's' },
+                                { v: r.materialSubstituto, t: 's' },
+                            ]
+                            i++;
+                        });
+
+                        break;
+
+                    }
+
+
+                default:
+                    {
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+                            { v: 'Contrato', t: 's' },
+                            { v: 'Data de Criação', t: 's' },
+                            { v: 'Início da Vigência', t: 's' },
+                            { v: 'Fim da Vigência', t: 's' },
+                            { v: 'Vigência inferior a 6 Meses?', t: 's' },
+                            { v: 'Moeda', t: 's' },
+                            { v: 'Cotação', t: 's' },
+                            { v: 'Valor do Contrato', t: 's' },
+                            { v: 'Valor disponível no Contrato', t: 's' },
+                            { v: 'Valor disponível no Contrato em R$', t: 's' },
+                            { v: '% Consumido do Contrato', t: 's' },
+                            { v: 'Mais de 75% do Contrato Consumido?', t: 's' },
+                            { v: 'Fornecedor', t: 's' },
+                            { v: 'Data da Informação', t: 's' },
+                            //  { v: 'Status do Contrato', t: 's' },
+
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresaNome, t: 's' },
+                                { v: r.contratoNumero, t: 's' },
+                                { v: r.contratoDataDoc, t: 'd' },
+                                { v: r.contratoIniPrazo, t: 'd' },
+                                { v: r.contratoFimValidade, t: 'd' },
+                                { v: r.vigenciaMenorQue6Meses, t: 's' },
+                                { v: r.baseCotacaoSigla, t: 's' },
+                                { v: r.baseCotacaoValor, t: 'n' },
+                                { v: r.contratoValFixado, t: 'n' },
+                                { v: r.contratoValGlPend, t: 'n' },
+                                { v: r.contratoValGlPendEmReal, t: 'n' },
+                                { v: r.percentualConsumidoContrato, t: 'n' },
+                                { v: r.maisDe75PercentDoContratoConsumido, t: 's' },
+                                { v: r.fornecedorNome, t: 's' },
+                                { v: r.contratoDataAlteracao, t: 'd' },
+                                //  { v: r.statusDoContrato  , t: 's' },
+
+                            ]
+                            i++;
+                        });
+
+                        break;
+                    }
+            }
+
+            var table = $('#tabelaContrato').tableExport();
+            table.export2file(dataRst, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Extrato_Contrato', '.xlsx')
+            var botao = $('#btn_exporta')[0]
+            var imagem = $('#imagemLoad')[0]
+            imagem.style.display = "none"
+            botao.style.visibility = "visible"
+
+        }
+        function CarregaDataTable() {
+
+
+
+
+            var sb = $('#divContrato')
+
+
+
+
+            sb.html('');
+
+            switch (tipoRetorno) {
+
+                case 'porMaterial':
+                    {
+
+                        sb.append("<table id='tabelaContrato' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa                               </th>" +
+                            " <th>Contrato                              </th>" +
+                            " <th>Item do Contrato                      </th>" +
+                            " <th>Material                              </th>" +
+                            " <th>Descricao do Material                 </th>" +
+                            " <th>Família                               </th>" +
+                            " <th>Gestor                                </th>" +
+                            " <th>Data de Criação                       </th>" +
+                            " <th>Início da Vigência                    </th>" +
+                            " <th>Fim da Vigência                       </th>" +
+                            " <th>Vigência inferior a 6 Meses?          </th>" +
+                            " <th>centro Logistico                      </th>" +
+                            " <th>Qtde do Contrato                      </th>" +
+                            " <th>Qtde Disponível                       </th>" +
+                            " <th>% Consumido do Material               </th>" +
+                            " <th>Mais de 75% do Item Consumido?        </th>" +
+                            " <th>Moeda                                 </th>" +
+                            " <th>Cotação                               </th>" +
+                            " <th>Valor do Contrato                     </th>" +
+                            " <th>Valor disponível no Contrato          </th>" +
+                            " <th>Valor disponível no Contrato em R$    </th>" +
+                            " <th>% Consumido do Contrato               </th>" +
+                            " <th>Mais de 75% do Contrato Consumido?    </th>" +
+                            " <th>Fornecedor                            </th>" +
+                            // " <th>Valor unitário do item                </th>" +
+                            //  " <th>Data da Informação                    </th>" +
+                            " <th>status do Contrato                    </th>" +
+
+                            "   <th>Material Bloqueado</th> " +
+                            "   <th>Material Substituido</th> " +
+
+
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaContrato").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+                                    dto,
+                                    tipoC: tipoRetorno,
+
+
+                                },
+                                url: '/api/Contratos/ListaContrato',
+                                dataSrc: "",
+                            },
+                            columns: [
+
+                                { data: "empresaNome" },
+                                { data: "contratoNumero" },
+                                { data: "itemDoContratoItm" },
+                                { data: "materialCodSap" },
+                                { data: "materialDescricao" },
+                                { data: "familiaNome" },
+                                { data: "userName" },
+                                {
+                                    data: "contratoDataDoc", render:
+                                        function (data, type, row) {
+                                            return (data.substring(0, 10));
+                                        }
+                                },
+                                {
+                                    data: "contratoIniPrazo", render:
+                                        function (data, type, row) {
+                                            return (data.substring(0, 10));
+                                        }
+                                },
+                                {
+                                    data: "contratoFimValidade", render:
+                                        function (data, type, row) {
+                                            return (data.substring(0, 10));
+                                        }
+                                },
+                                { data: "vigenciaMenorQue6Meses" },
+                                { data: "centroLogisticoCodSap" },
+                                { data: "itemDoContratoQtdeContrato" },
+                                { data: "itemDoContratoQtdeDisp" },
+                                {
+                                    data: "percentualConsumidoMaterial",
+                                    render:
+                                        function (data, type, row) {
+                                            return (Math.floor(data * 100, 2) + ' %');
+                                        }
+                                },
+                                { data: "maisDe75PercentDoItemConsumido" },
+                                { data: "baseCotacaoSigla" },
+                                { data: "baseCotacaoValor", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "contratoValFixado", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "contratoValGlPend", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "contratoValGlPendEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                {
+                                    data: "percentualConsumidoContrato",
+                                    render:
+                                        function (data, type, row) {
+                                            return (Math.floor(data * 100, 2) + ' %');
+                                        }
+                                },
+                                { data: "maisDe75PercentDoContratoConsumido" },
+                                { data: "fornecedorNome" },
+                                //{ data: "valorDeReferencia", render: $.fn.dataTable.render.number('.', ',', 2)},
+                                //   { data: "contratoDataAlteracao" },
+                                { data: "statusDoContrato" },
+
+
+
+                                {
+                                    data: "materialBloqueado",
+                                    render: function (data, type, material, td) {
+
+                                        if (material.materialBloqueado) {
+
+                                            return "x";
+                                        }
+
+
+                                        return null;
+
+
+                                    }
+                                },
+                                { data: "materialSubstituto" },
+
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "360px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 4,
+                            },
+                            "createdRow": function (row, data, dataIndex) {
+                                if (data.materialBloqueado != false) {
+                                    $(row).addClass('red');
+
+                                }
+
+
+                            }
+                        });
+
+                        break;
+
+                    }
+
+
+
+
+                default:
+                    {
+
+
+
+                        sb.append("<table id='tabelaContrato' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th>" +
+                            " <th>Contrato</th>" +
+                            " <th>Data de Criação</th>" +
+                            " <th>Início da Vigência</th>" +
+                            " <th>Fim da Vigência</th>" +
+                            " <th>Vigência inferior a 6 Meses?</th>" +
+                            " <th>Moeda</th>" +
+                            " <th>Cotação</th>" +
+                            " <th>Valor do Contrato</th>" +
+                            " <th>Valor disponível no Contrato</th>" +
+                            " <th>Valor disponível no Contrato em R$</th>" +
+                            " <th>% Consumido do Contrato</th>" +
+                            " <th>Mais de 75% do Contrato Consumido?</th>" +
+                            " <th>Fornecedor</th>" +
+                            //  " <th>Data da Informação</th>" +
+                            //   " <th>Status do Contrato</th>" +
+
+
+
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaContrato").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+                                    dto,
+                                    tipoC:
+                                        tipoRetorno,
+
+                                },
+                                url: '/api/Contratos/ListaContrato',
+                                dataSrc: "",
+                            },
+                            columns: [
+
+                                { data: "empresaNome" },
+                                { data: "contratoNumero" },
+                                {
+                                    data: "contratoDataDoc", render:
+                                        function (data, type, row) {
+                                            return (data.substring(0, 10));
+                                        }
+                                },
+                                {
+                                    data: "contratoIniPrazo", render:
+                                        function (data, type, row) {
+                                            return (data.substring(0, 10));
+                                        }
+                                },
+                                {
+                                    data: "contratoFimValidade", render:
+                                        function (data, type, row) {
+                                            return (data.substring(0, 10));
+                                        }
+                                },
+                                { data: "vigenciaMenorQue6Meses", },
+                                { data: "baseCotacaoSigla" },
+                                { data: "baseCotacaoValor", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                { data: "contratoValFixado", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "contratoValGlPend", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "contratoValGlPendEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                                {
+                                    data: "percentualConsumidoContrato",
+                                    render:
+                                        function (data, type, row) {
+                                            return (Math.floor(data * 100, 2) + ' %');
+                                        }
+                                },
+                                { data: "maisDe75PercentDoContratoConsumido" },
+                                { data: "fornecedorNome" },
+                                //   { data: "contratoDataAlteracao" },
+                                //  { data: "statusDoContrato" },
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "360px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 2,
+                            },
+
+                        });
+
+                        break;
+                    }
+            }
+            var imgm = $('#imagemLoad')[0]
+            imgm.style.display = "none"
+        }
+
+
+
+        $(document).ready(function () {
+             brazil = @User.IsInRole(RoleName.Brazil).ToString().ToLower()
+            CarregaCabecalho()
+            $('.demo-default').on("change", function () {
+                var imgm = $('#imagemLoad')[0]
+                imgm.style.display = ""
+
+                CarregaCabecalho()
+
+            });
+
+            $('.radio').on('change', function () {
+                tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+
+                CarregaDataTable();
+
+            });
+
+
+            $('#btn_exporta').on('click', function () {
+                var botao = $('#btn_exporta')[0]
+                var imagem = $('#imagemLoad')[0]
+                imagem.style.display = ""
+                botao.style.visibility = 'hidden'
+
+                $.ajax({
+                    type: 'GET',
+                    data: {
+                        dto,
+
+                        tipoC: tipoRetorno,
+                    },
+                    url: '/api/Contratos/ListaContrato',
+                    dataSrc: "",
+                    success: function (d) {
+
+                        ExportaPagina(d);
+
+
+                    }
+
+                })
+
+            });
+        })
+
+
+
+
+    </script>
+}
+
+
+
+@*
+
+    empresaNome                                                   Empresa
+    contratoNumero                                                Contrato
+    itemDoContratoItm                                             Item do Contrato
+    materialCodSap                                                Material
+    materialDescricao                                             Descricao do Material
+    familiaNome                                                   Família
+    userName                                                      Gestor
+    contratoDataDoc                                               Data de Criação
+    contratoIniPrazo                                              Início da Vigência
+    contratoFimValidade                                           Fim da Vigência
+    vigenciaMenorQue6Meses                                        Vigência inferior a 6 Meses?
+    centroLogisticoCodSap                                         centro Logistico
+    itemDoContratoQtdeContrato                                    Qtde do Contrato
+    itemDoContratoQtdeDisp                                        Qtde Disponível
+    percentualConsumidoMaterial                                   % Consumido
+    maisDe75PercentDoItemConsumido                                Mais de 75% do Item Consumido?
+    baseCotacaoSigla                                              Moeda
+    baseCotacaoValor                                              Cotação
+    contratoValFixado                                             Valor do Contrato
+    contratoValGlPend                                             Valor disponível no Contrato
+    contratoValGlPendEmReal                                       Valor disponível no Contrato em R$
+    percentualConsumidoContrato                                   percentualConsumidoContrato
+    maisDe75PercentDoContratoConsumido                            Mais de 75% do Contrato Consumido?
+    fornecedorNome                                                Fornecedor
+    valorDeReferencia                                             Valor unitário do item
+    contratoDataAlteracao                                             Data da Informação
+    statusDoContrato                                              status do Contrato
+
+
+    empresaNome                                                   Empresa
+    contratoNumero                                                Contrato
+    contratoDataDoc                                               Data de Criação
+    contratoIniPrazo                                              Início da Vigência
+    contratoFimValidade                                           Fim da Vigência
+    vigenciaMenorQue6Meses                                        Vigência inferior a 6 Meses?
+    baseCotacaoSigla                                              Moeda
+    baseCotacaoValor                                              Cotação
+    contratoValFixado                                             Valor do Contrato
+    contratoValGlPend                                             Valor disponível no Contrato
+    contratoValGlPendEmReal                                       Valor disponível no Contrato em R$
+    percentualConsumidoContrato                                   % Consumido do Contrato
+    maisDe75PercentDoContratoConsumido                            Mais de 75% do Contrato Consumido?
+    fornecedorNome                                                Fornecedor
+    contratoDataAlteracao                                             Data da Informação
+    statusDoContrato                                              status do Contrato
+
+
+*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

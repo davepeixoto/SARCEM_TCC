@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
+using SARCEM_TCC.web.Data.Context;
 using SARCEM_TCC.web.Models;
 
 namespace SARCEM_TCC.web

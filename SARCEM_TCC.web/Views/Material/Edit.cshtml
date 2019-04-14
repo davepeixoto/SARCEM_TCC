@@ -1,0 +1,244 @@
+﻿@model SARCEM_TCC.web.ViewModels.MaterialViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Atualizações de Material</h2>
+
+<h3> Empresa: <strong>@Model.EmpresaNome</strong></h3>
+
+<h3> Material: <strong>@Model.MaterialCodSap</strong></h3>
+
+@using (Html.BeginForm("Edit", "Material", FormMethod.Post,
+                            new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <hr />
+    @Html.ValidationSummary(true, "Por favor corrija os erros sinalizados")
+
+
+    <style>
+
+        .select2-dropdown {
+            width: 100%;
+            color: rgb(8, 8, 8);
+        }
+
+        .select2-container .select2-selection--single, .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow b {
+                border-color: #000 transparent transparent transparent;
+                border-style: solid;
+                border-width: 5px 4px 0 4px;
+                height: 0;
+                left: 50%;
+                margin-left: -4px;
+                margin-top: -2px;
+                position: absolute;
+                top: 50%;
+                width: 0;
+            }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #444;
+            line-height: 38px;
+        }
+    </style>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MaterialDescricao, new { @class = "col-md-2 control-label" })
+        <div class="col-md-6">
+            @Html.TextBoxFor(m => m.MaterialDescricao, new { @Value = Model.MaterialDescricao, @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.MaterialDescricao)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MaterialClasse, new { @class = "col-md-2 control-label" })
+        <div class="col-md-2">
+            @Html.TextBoxFor(m => m.MaterialClasse, new { @Value = Model.MaterialClasse, @class = "form-control" })
+        </div>
+        @Html.ValidationMessageFor(m => m.MaterialClasse)
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MaterialUM, new { @class = "col-md-2 control-label" })
+        <div class="col-md-2">
+            @Html.TextBoxFor(m => m.MaterialUM, new { @Value = Model.MaterialUM, @class = "form-control" })
+        </div>
+        @Html.ValidationMessageFor(m => m.MaterialUM)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ClassificacaoID, new { @class = "col-md-2 control-label" })
+        <div class="col-md-6">
+            @Html.DropDownListFor(m => m.ClassificacaoID,
+                                          new SelectList(Model.Classificacoes, "ClassificacaoID", "ClassificacaoNome"),
+                                          new { @class = "form-control", @id = "listaClassificacao" })
+            @Html.ValidationMessageFor(m => m.ClassificacaoID)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.FamiliaID, new { @class = "col-md-2 control-label" })
+        <div class="col-md-6">
+            @Html.DropDownListFor(m => m.FamiliaID,
+                                          new SelectList(Model.Familias, "FamiliaID", "FamiliaNome"),
+                                          new { @class = "form-control", @id = "listaFamilia" })
+            @Html.ValidationMessageFor(m => m.FamiliaID)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MGCodeID, new { @class = "col-md-2 control-label" })
+        <div class="col-md-6">
+            @Html.DropDownListFor(m => m.MGCodeID,
+                               new SelectList((from x in Model.MGCodes.ToList()
+                                               select new
+                                               {
+                                                   MGCodeID = x.MGCodeID,
+                                                   MGCodeSelect = x.MGCodeCodigoSap + " - " + x.MGCodeDescricao
+                                               }).ToList(), "MGCodeID", "MGCodeSelect"),
+                                          new
+                                          {
+                                              @class = "form-control",
+                                              @id = "listaMgCode"
+                                          })
+            @Html.ValidationMessageFor(m => m.MGCodeID)
+        </div>
+    </div>
+
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MaterialSubId, new { @class = "col-md-2 control-label" })
+        <div class="col-md-6">
+            @Html.DropDownListFor(m => m.MaterialSubId,
+                                           new SelectList((from x in Model.Materiais.ToList()
+                                                           select new
+                                                           {
+                                                               MaterialID = x.MaterialID,
+                                                               MaterialSelect = x.MaterialCodSap + " - " + x.MaterialDescricao
+                                                           }).ToList(), "MaterialID", "MaterialSelect"),
+                                           new { @class = "form-control", @id = "listaMaterialSub" })
+            @*@Html.ValidationMessageFor(m => m.MaterialSubId)*@
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ValorDeReferencia, new { @class = "col-md-2 control-label" })
+        <div class="col-md-2">
+            @Html.TextBoxFor(m => m.ValorDeReferencia, new { @Value = string.Format("{0:N}",Model.ValorDeReferencia), @class = "form-control" })
+        </div>
+        @*@Html.ValidationMessageFor(m => m.ValorDeReferencia)*@
+    </div>
+
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MaterialObservacoes, new { @class = "col-md-2 control-label" })
+        <div class="col-md-6">
+            @Html.TextAreaFor(m => m.MaterialObservacoes, new
+            {
+                @class = "form-control",
+                @Rows = "4"
+            })
+            @Html.ValidationMessageFor(m => m.MaterialObservacoes)
+        </div>
+    </div>
+
+
+    <div class="form-group">
+
+        @Html.LabelFor(m => m.MaterialBloqueado, new { @class = "col-md-2 control-label" })
+
+        <div class="col-sd-6 col-md-1" style="width: 5.666667%; PADDING-TOP: 0.5%;">
+            @Html.CheckBoxFor(m => m.MaterialBloqueado, new { @class = "form-control form-check-input", @id = "matBlock", @checked=Model.MaterialBloqueado })
+
+        </div>
+        @Html.ValidationMessageFor(m => m.MaterialBloqueado)
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-default" value="Alterar" />
+        </div>
+    </div>
+
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+
+    $(document).ready(function () {
+
+        $('#listaClassificacao')[0].value = @Model.ClassificacaoID
+            $('#listaFamilia')[0].value =   @Model.FamiliaID
+        $('#listaMgCode')[0].value =        @Model.MGCodeID
+        $('#listaMaterialSub')[0].value =   @Model.MaterialSubId
+        //$('#matBlock')[0].checked =         @*@Model.ValorReferencia.MaterialBloqueado;*@
+        //var x = $("#ValorDeReferencia")[0].value;
+        //$("#ValorDeReferencia")[0].value = x.replace(",", ".");
+
+            $('#listaClassificacao').select2({
+
+                placeholder: "Selecione a Classificacao",
+                language: "pt-BR",
+                allowClear: true,
+
+            }, );
+
+            $('#listaFamilia').select2({
+
+                placeholder: "Selecione a Classificacao",
+                language: "pt-BR",
+                allowClear: true,
+
+            }, );
+
+
+            $('#listaMgCode').select2({
+
+                placeholder: "Selecione a Classificacao",
+                language: "pt-BR",
+                allowClear: true,
+
+        }, );
+
+        $('#listaMaterialSub').select2({
+
+                placeholder: "Selecione a Classificacao",
+                language: "pt-BR",
+                allowClear: true,
+
+            }, );
+
+
+        $('.select2')[0].style.width = "100%"
+
+
+        //$.validator.methods.range = function (value, element, param) {
+        //    var globalizedValue = value.replace(",", ".");
+        //    return this.optional(element) || (globalizedValue >= param[0] && globalizedValue <= param[1]);
+        //}
+
+        //$.validator.methods.number = function (value, element) {
+        //    return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.,]\d+)?$/.test(value);
+        //}
+
+        });
+
+
+
+    </script>
+
+}

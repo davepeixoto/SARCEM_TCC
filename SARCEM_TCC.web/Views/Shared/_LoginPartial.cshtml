@@ -1,22 +1,180 @@
 ﻿@using Microsoft.AspNet.Identity
+@using SARCEM_TCC.web.Models
+
 @if (Request.IsAuthenticated)
 {
+<ul class="nav navbar-nav navbar-left">
+    <li>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="margin-left:25px;">
+            Informações de Materiais
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" style="margin-left:25px;">
+
+            <li>@Html.ActionLink("Relação de Materiais", "Index", "Material")</li>
+
+
+        </ul>
+    </li>
+    @if (
+        User.IsInRole(RoleName.F0b1)||
+        User.IsInRole(RoleName.Contrato)||
+        User.IsInRole(RoleName.Zmep)||
+        User.IsInRole(RoleName.EstoqueConsumo)||
+        User.IsInRole(RoleName.MiniImpaq)||
+        User.IsInRole(RoleName.Cpm)||
+        User.IsInRole(RoleName.EstoqueHistorico)||
+        User.IsInRole(RoleName.Plm)||
+        User.IsInRole(RoleName.Appia)
+        )
+    {
+        <li>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Relatórios
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li role="presentation" class="dropdown-header">Informações Diárias</li>
+
+                @if (User.IsInRole(RoleName.Contrato))
+                {
+                    <li>@Html.ActionLink("Contratos", "Index", "Contrato")</li>
+                }
+
+
+                @if (User.IsInRole(RoleName.Zmep))
+                {
+                    <li>@Html.ActionLink("Entregas Previstas", "Index", "Zmep")</li>
+                }
+
+
+                @if (User.IsInRole(RoleName.EstoqueConsumo))
+                {
+                    <li>@Html.ActionLink("Estoque e Consumo", "Index", "EstoqueConsumo")</li>
+                }
+
+                @if (User.IsInRole(RoleName.MiniImpaq))
+                {
+                    <li>@Html.ActionLink("Mini Impaq", "Index", "MiniImpaq")</li>
+                }
+
+                @if (User.IsInRole(RoleName.EstoqueHistorico) || User.IsInRole(RoleName.Cpm))
+                {
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation" class="dropdown-header">Informações Históricas</li>
+                }
+
+                @if (User.IsInRole(RoleName.Cpm))
+                {
+                    <li>@Html.ActionLink("CPMs", "Index", "HistConsumo")</li>
+                }
+
+                @if (User.IsInRole(RoleName.EstoqueHistorico))
+                {
+                    <li>@Html.ActionLink("Histórico de Estoque", "Index", "EstoqueHistorico")</li>
+                }
+
+                @if (User.IsInRole(RoleName.Plm) || User.IsInRole(RoleName.Appia))
+                {
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation" class="dropdown-header">Previsões de Consumo</li>
+
+                }
+
+                @if (User.IsInRole(RoleName.Appia))
+                {
+                    <li>@Html.ActionLink("Appia", "Index", "Appia")</li>
+                }
+
+                @if (User.IsInRole(RoleName.Plm))
+                {
+                    <li>@Html.ActionLink("PLM", "Index", "PlmMensalizado")</li>
+                }
+
+
+            </ul>
+        </li>
+
+    }
+        @*@if (Request.IsAuthenticated)
+            {
+                @Html.Partial("_NavBarLogistica")
+            }*@
+
+
+    @if (User.IsInRole(RoleName.F0b1))
+    {
+        <li>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                S&L Brazil
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+
+                <li>@Html.ActionLink("Estoque F0B1", "Index", "F0B1")</li>
+                <li>@Html.ActionLink("Coberturas Appia e PLM", "Index", "Cobetura")</li>
+
+
+            </ul>
+        </li>
+    }
+
+
+
+</ul>
+
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
-    @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-    <ul class="nav navbar-nav navbar-right">
-        <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
-        </li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
-    </ul>
+
+
+
+        <ul class="nav navbar-nav navbar-right">
+
+
+            <li>
+                @Html.ActionLink("Olá " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+            </li>
+
+            <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    Controle de Acesso
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+
+                    <li>@Html.ActionLink("Autalize seu dados", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+                    <li><a href="javascript:document.getElementById('logoutForm').submit()">Sair do Sistema</a></li>
+                    @if (Request.IsAuthenticated && User.IsInRole(RoleName.Administrador))
+                    {
+                        <li>@Html.ActionLink("Administração de Usuários", "Index", "RolesAdmin")</li>
+                    }
+
+                    @*<li>@Html.ActionLink("Sair do Sistema", "LogOff", "Account")</li>*@
+                </ul>
+            </li>
+
+        </ul>
     }
 }
 else
 {
     <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
-        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+
+        <li>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Controle de Acesso
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+
+                <li>@Html.ActionLink("Realize o Login", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+                <li>@Html.ActionLink("Registre -se", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+
+            </ul>
+        </li>
+
+
     </ul>
 }

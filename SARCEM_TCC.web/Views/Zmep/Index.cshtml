@@ -1,0 +1,617 @@
+﻿@using SARCEM_TCC.web.Models
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Entregas Previstas";
+}
+
+<div style="float:left">
+<h2>@ViewBag.Title </h2>
+<h4>Previsão de Entrega de materiais</h4>
+<h6>Informação atualizada em @ViewBag.data</h6>
+
+
+</div>
+
+
+<div style="float:right;margin-top: 2%;padding-right: 2%;">
+
+    <h5 id="headerEmpresa"> <span id="spanEmpresa"></span></h5>
+
+
+</div>
+
+@{
+    string dropdow = "";
+
+    if (User.IsInRole(RoleName.Brazil))
+    {
+        dropdow = "_DropDownsBrazil";
+    }
+    else
+    {
+
+        dropdow = "_DropDowns";
+    }
+
+
+}
+<div class="row">
+
+
+
+    <div id="DropDownsContainer" style="margin-top:1%">
+
+        @Html.Partial(dropdow)
+
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="col-lg-12 ">
+        <div style="margin-top: 2%;">
+
+            <div class="pull-right">
+                <button id="btn_exporta" class="btn btn-default xlsx">Exporte para Excel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div style="margin-top: 2%;">
+        <div class="col-lg-12">
+            <style>
+                th {
+                    text-align: center;
+                }
+
+                .DTFC_LeftBodyLiner {
+                    top: -12px !important;
+                }
+            </style>
+            <div id="divMaterial">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        var brazil
+        var cabecalho
+        var dto
+        var data
+
+        data = new Date();
+        AnoAtual = data.getFullYear();
+
+        function CarregaCabecalho() {
+            var imgm = $('#imagemLoad')[0];
+            imgm.style.display = "";
+            dto = {
+                Empresa: $('#listaEmpresa').val(),
+                Pedido: $('#listaPedido').val(),
+                Material: $('#listaMaterial').val(),
+                Familia: $('#listaFamilia').val(),
+                Gestor: $('#listaGestor').val(),
+                Fornecedor: $('#listaFornecedor').val(),
+                Status: $('#listaStatus').val(),
+                Mes: $('#listaMes').val(),
+                Ano: $('#listaAno').val()
+
+
+            };
+
+            cabecalho = '';
+            cabecalho = new Array();
+
+            $.ajax({
+                type: 'GET',
+                data: {
+                    dto
+                },
+                url: '/api/Zmeps/TrazDropDown',
+                dataSrc: "",
+                success: function (d) {
+
+                    cabecalho = d;
+                    CriaDropDowm(cabecalho);
+
+                },
+                datatype: 'json'
+
+            });
+        }
+
+        function CriaDropDowm(cabecalho) {
+            if (cabecalho.empresas.length === 1)
+                $('#spanEmpresa')[0].textContent = cabecalho.empresas[0]
+            else
+                $('#spanEmpresa')[0].textContent = ""
+
+
+
+                $('#listaEmpresa').html('');
+
+                if (dto.Empresa === '') {
+                    $('#listaEmpresa').append("<option value=''></option>");
+                    cabecalho.empresas.forEach(function (e) {
+                        $('#listaEmpresa').append("<option value='" + e + "'>" + e + "</option>");
+                    });
+
+                } else {
+                    $('#listaEmpresa').append("<option value='" + dto.Empresa + "' selected>" + dto.Empresa + "</option>");
+                    $('#listaEmpresa').append("<option value='' ></option>");
+
+                }
+
+
+
+
+            $('#listaPedido').html('');
+
+            if (dto.Pedido === '') {
+                $('#listaPedido').append("<option value=''></option>");
+                cabecalho.pedidos.forEach(function (e) {
+                    $('#listaPedido').append("<option value='" + e + "'>" + e + "</option>");
+                });
+
+            } else {
+                $('#listaPedido').append("<option value='" + dto.Pedido + "' selected>" + dto.Pedido + "</option>");
+                $('#listaPedido').append("<option value='' ></option>");
+
+            }
+
+
+            $('#listaMaterial').html('');
+            if (dto.Material === '') {
+                $('#listaMaterial').append("<option value=''></option>");
+                cabecalho.materiais.forEach(function (e) {
+                    $('#listaMaterial').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaMaterial').append("<option value='" + dto.Material + "'selected>" + dto.Material + "</option>");
+                $('#listaMaterial').append("<option value=''></option>");
+            }
+
+
+            $('#listaFamilia').html('');
+            if (dto.Familia === '') {
+                $('#listaFamilia').append("<option value=''></option>");
+                cabecalho.familias.forEach(function (e) {
+                    $('#listaFamilia').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaFamilia').append("<option value='" + dto.Familia + "'selected>" + dto.Familia + "</option>");
+                $('#listaFamilia').append("<option value=''></option>");
+            }
+
+            $('#listaGestor').html('');
+            if (dto.Gestor === '') {
+                $('#listaGestor').append("<option value=''></option>");
+                cabecalho.gestores.forEach(function (e) {
+                    $('#listaGestor').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaGestor').append("<option value='" + dto.Gestor + "' selected>" + dto.Gestor + "</option>");
+                $('#listaGestor').append("<option value=''></option>");
+            }
+
+
+            $('#listaFornecedor').html('');
+            if (dto.Fornecedor === '') {
+                $('#listaFornecedor').append("<option value=''></option>");
+                cabecalho.fornecedores.forEach(function (e) {
+                    $('#listaFornecedor').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaFornecedor').append("<option value='" + dto.Fornecedor + "' selected>" + dto.Fornecedor + "</option>");
+                $('#listaFornecedor').append("<option value=''></option>");
+            }
+
+
+
+            $('#listaStatus').html('');
+            if (dto.Status === '') {
+                $('#listaStatus').append("<option value=''></option>");
+                cabecalho.statuss.forEach(function (e) {
+                    $('#listaStatus').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaStatus').append("<option value='" + dto.Status + "' selected>" + dto.Status + "</option>");
+                $('#listaStatus').append("<option value=''></option>");
+            }
+
+
+            $('#listaMes').html('');
+            if (dto.Mes === '') {
+                $('#listaMes').append("<option value=''></option>");
+                cabecalho.mess.forEach(function (e) {
+                    $('#listaMes').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaMes').append("<option value='" + dto.Mes + "' selected>" + dto.Mes + "</option>");
+                $('#listaMes').append("<option value=''></option>");
+            }
+
+
+            $('#listaAno').html('');
+            if (dto.Ano === '') {
+                $('#listaAno').append("<option value=''></option>");
+                cabecalho.anos.forEach(function (e) {
+                    $('#listaAno').append("<option value='" + e + "'>" + e + "</option>");
+                });
+            } else {
+                $('#listaAno').append("<option value='" + dto.Ano + "' selected>" + dto.Ano + "</option>");
+                $('#listaAno').append("<option value=''></option>");
+            }
+
+
+            $('#listaEmpresa').select2({
+                theme: "classic",
+                placeholder: "Selecione a Empresa",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaPedido').select2({
+                theme: "classic",
+                placeholder: "Selecione o Pedido",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaMaterial').select2({
+                theme: "classic",
+                placeholder: "Selecione o Material",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaFamilia').select2({
+                theme: "classic",
+                placeholder: "Selecione a Família",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaGestor').select2({
+                theme: "classic",
+                placeholder: "Selecione o Gestor",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaFornecedor').select2({
+                theme: "classic",
+                placeholder: "Selecione o Fornecedor",
+                language: "pt-BR",
+                allowClear: true
+            });
+            $('#listaStatus').select2({
+                theme: "classic",
+                placeholder: "Selecione o Status",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaMes').select2({
+                theme: "classic",
+                placeholder: "Selecione o Mês",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+            $('#listaAno').select2({
+                theme: "classic",
+                placeholder: "Selecione o Ano",
+                language: "pt-BR",
+                allowClear: true
+            });
+
+
+            var estilo = $('.select2');
+
+            for (var i = 0; i < estilo.length; i++) {
+                estilo[i].style.width = '100%';
+            }
+
+
+
+
+            CarregaDataTable();
+
+        }
+
+        function ExportaPagina(result) {
+            table = '';
+
+            dataRst = '';
+
+
+
+            dataRst = new Array();
+
+
+            var i = 1;
+
+            dataRst[0] = [
+
+                { v: 'Empresa', t: 's' },
+                { v: 'Pedido de Compra', t: 's' },
+                { v: 'Item', t: 's' },
+                { v: 'Material', t: 's' },
+                { v: 'Descrição do Material', t: 's' },
+                { v: 'Unidade de Medida', t: 's' },
+                { v: 'Classe', t: 's' },
+                { v: 'Classificação', t: 's' },
+                { v: 'Família', t: 's' },
+                { v: 'Mg Code', t: 's' },
+                { v: 'Descrição Mg Code', t: 's' },
+                { v: 'Gestor', t: 's' },
+                { v: 'Previsão de Entrega', t: 's' },
+                { v: 'Status', t: 's' },
+                { v: 'Mês', t: 's' },
+                { v: 'Ano', t: 's' },
+                { v: 'Qtde da Compra', t: 's' },
+                { v: 'Qtde Pendente entrega', t: 's' },
+                { v: 'Valor da Compra', t: 's' },
+                { v: 'Valor Pendente entrega', t: 's' },
+                { v: 'Valor Pendente entrega em R$', t: 's' },
+                { v: 'Moeda', t: 's' },
+                { v: 'Cotação', t: 's' },
+                { v: 'Fornecedor', t: 's' },
+                { v: 'contrato', t: 's' },
+                { v: 'Data da compra', t: 's' },
+                { v: 'Condicao de Pagamento', t: 's' },
+                { v: 'Descrição da Condicao de Pagamento', t: 's' },
+                { v: 'Compra para Centro Imputado', t: 's' },
+                { v: 'Data da Informação', t: 's' },
+                { v: 'Material Bloqueado', t: 's' },
+                { v: 'Material Substituido', t: 's' }
+
+
+            ];
+
+            result.forEach(function (r) {
+
+                dataRst[i] = [
+                    { v: r.empresaNome, t: 's' },
+                    { v: r.zmepPedido, t: 's' },
+                    { v: r.posicao, t: 's' },
+                    { v: r.materialCodSap, t: 's' },
+                    { v: r.materialDescricao, t: 's' },
+                    { v: r.materialUM, t: 's' },
+                    { v: r.materialClasse, t: 's' },
+                    { v: r.classificacaoNome, t: 's' },
+                    { v: r.familiaNome, t: 's' },
+                    { v: r.mgCodeCodigoSap, t: 's' },
+                    { v: r.mgCodeDescricao, t: 's' },
+                    { v: r.userName, t: 's' },
+                    { v: r.zmepDataEntrg, t: 'd' },
+                    { v: r.status, t: 's' },
+                    { v: r.mes, t: 'n' },
+                    { v: r.ano, t: 'n' },
+                    { v: r.zmepQtdePedido, t: 'n' },
+                    { v: r.zmepQtdeEmPend, t: 'n' },
+                    { v: r.zmepImpPedido, t: 'n' },
+                    { v: r.zmepImpEmPend, t: 'n' },
+                    { v: r.montantePendenteEntregaEmReal, t: 'n' },
+                    { v: r.baseCotacaoSigla, t: 's' },
+                    { v: r.baseCotacaoValor, t: 'n' },
+                    { v: r.fornecedorNome, t: 's' },
+                    { v: r.contratoNumero, t: '' },
+                    { v: r.zmepDataDaCompra, t: 'd' },
+                    { v: r.condicaoDePagamentoCodSap, t: 's' },
+                    { v: r.condicaoDePagamentoDescricao, t: 's' },
+                    { v: r.zmepCentroImputado, t: 's' },
+                    { v: r.zmepDataLanc, t: 'd' },
+                    { v: r.materialBloqueado, t: 's' },
+                    { v: r.materialSubstituto, t: 's' },
+
+                ];
+                i++;
+            });
+
+
+            var table = $('#zmepTable').tableExport();
+            table.export2file(dataRst, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Listagem_de_Entregas', '.xlsx');
+            var botao = $('#btn_exporta')[0];
+            var imagem = $('#imagemLoad')[0];
+            imagem.style.display = "none";
+            botao.style.visibility = "visible";
+            return;
+        }
+
+        function CarregaDataTable() {
+
+            var sb = $('#divMaterial');
+            sb.html('');
+            sb.append("<table id='zmepTable' class='table table- striped text- nowrap table- hover'>" +
+                "  <thead > <tr>" +
+
+                "   <th>Empresa                             </th> " +
+                "   <th>Pedido de Compra                    </th> " +
+                "   <th>Item                                </th> " +
+                "   <th>Material                            </th> " +
+                "   <th>Descrição do Material               </th> " +
+                "   <th>Unidade de Medida                   </th> " +
+                "   <th>Classe                              </th> " +
+                "   <th>Classificação                       </th> " +
+                "   <th>Família                             </th> " +
+                "   <th>Mg Code                             </th> " +
+                "   <th>Descrição Mg Code                   </th> " +
+                "   <th>Gestor                              </th> " +
+                "   <th>Previsão de Entrega                 </th> " +
+                "   <th>Status                              </th> " +
+                "   <th>Mês                                 </th> " +
+                "   <th>Ano                                 </th> " +
+                "   <th>Qtde da Compra                      </th> " +
+                "   <th>Qtde Pendente entrega               </th> " +
+                "   <th>Valor da Compra                     </th> " +
+                "   <th>Valor Pendente entrega              </th> " +
+                "   <th>Valor Pendente entrega em R$        </th> " +
+                "   <th>Moeda                               </th> " +
+                "   <th>Cotação                             </th> " +
+                "   <th>Fornecedor                          </th> " +
+                "   <th>contrato                            </th> " +
+                "   <th>Data da compra                      </th> " +
+                "   <th>Condicao de Pagamento               </th> " +
+                "   <th>Descrição da Condicao de Pagamento  </th> " +
+                "   <th>Compra para Centro Imputado         </th>" +
+                //   "   <th>Data da Informação                  </th> " +
+                "   <th>Material Bloqueado</th> " +
+                "   <th>Material Substituido</th> " +
+
+                " </tr> </thead > <tbody> </tbody> </table >"
+            );
+
+
+
+
+
+
+
+
+
+            var tabela = $("#zmepTable").DataTable({
+
+                ajax: {
+                    data: {
+                        dto
+                    },
+                    url: "/api/Zmeps/ListaZmep",
+                    dataSrc: ""
+                },
+                columns: [
+
+                    { data: "empresaNome" },
+                    { data: "zmepPedido" },
+                    { data: "posicao" },
+                    { data: "materialCodSap" },
+                    { data: "materialDescricao" },
+                    { data: "materialUM" },
+                    { data: "materialClasse" },
+                    { data: "classificacaoNome" },
+                    { data: "familiaNome" },
+                    { data: "mgCodeCodigoSap" },
+                    { data: "mgCodeDescricao" },
+                    { data: "userName" },
+                    {
+                        data: "zmepDataEntrg", render:
+                            function (data, type, row) {
+                                return data.substring(0, 10);
+                            }
+                    },
+                    { data: "status" },
+                    { data: "mes" },
+                    { data: "ano" },
+                    { data: "zmepQtdePedido", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "zmepQtdeEmPend", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "zmepImpPedido", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "zmepImpEmPend", render: $.fn.dataTable.render.number('.', ',', 2) },
+                    { data: "montantePendenteEntregaEmReal", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                    { data: "baseCotacaoSigla" },
+                    { data: "baseCotacaoValor", render: $.fn.dataTable.render.number('.', ',', 2, 'R$ ') },
+                    { data: "fornecedorNome" },
+                    { data: "contratoNumero" },
+                    {
+                        data: "zmepDataDaCompra", render:
+                            function (data, type, row) {
+                                return data.substring(0, 10);
+                            }
+                    },
+                    { data: "condicaoDePagamentoCodSap" },
+                    { data: "condicaoDePagamentoDescricao" },
+                    { data: "zmepCentroImputado" },
+                    //{data: "zmepDataLanc" },
+                    {
+                        data: "materialBloqueado",
+                        render: function (data, type, material, td) {
+
+                            if (material.materialBloqueado) {
+
+                                return "x";
+                            }
+
+
+                            return null;
+
+
+                        }
+                    },
+                    { data: "materialSubstituto" },
+
+
+                ],
+
+                "scrollX": true,
+                "scrollY": "360px",
+                "scrollCollapse": true,
+                "deferRender": true,
+                "fixedColumns": {
+                    leftColumns: 4,
+                }, "createdRow": function (row, data, dataIndex) {
+                    if (data.materialBloqueado != false) {
+                        $(row).addClass('red');
+
+                    }
+
+
+                }
+
+
+
+            });
+
+            var imgm = $('#imagemLoad')[0];
+            imgm.style.display = "none";
+        }
+
+
+
+        $(document).ready(function () {
+              brazil = @User.IsInRole(RoleName.Brazil).ToString().ToLower()
+            CarregaCabecalho();
+            $('.demo-default').on("change", function () {
+                var imgm = $('#imagemLoad')[0];
+                imgm.style.display = "";
+
+                CarregaCabecalho();
+            });
+
+            $('#btn_exporta').on('click', function () {
+                var botao = $('#btn_exporta')[0];
+                var imagem = $('#imagemLoad')[0];
+                imagem.style.display = "";
+                botao.style.visibility = 'hidden';
+
+                $.ajax({
+                    type: 'GET',
+                    data: {
+                        dto
+                    },
+                    url: "/api/Zmeps/ListaZmep",
+                    dataSrc: "",
+                    success: function (d) {
+
+                        ExportaPagina(d);
+
+
+                    }
+
+                });
+
+            });
+        });
+
+
+
+
+
+    </script>
+}
+

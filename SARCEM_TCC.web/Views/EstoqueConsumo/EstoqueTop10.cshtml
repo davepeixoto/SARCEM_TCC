@@ -1,0 +1,369 @@
+﻿
+@{
+    ViewBag.Title = "EstoqueTop10";
+}
+
+<h2>EstoqueTop10</h2>
+<link href="~/Content/c3.css" rel="stylesheet" />
+
+<div id="chart"></div>
+@*<canvas id="myChart"></canvas>
+
+<div id="chart_div" style="width: 900px; height: 500px;"></div>*@
+<script src="~/Scripts/d3.min.js" charset="utf-8"></script>
+<script src="~/Scripts/c3.min.js"></script>
+
+@section scripts
+{
+<script src="~/Scripts/Chart.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+
+
+    <script>
+        var familia = [];
+        var sapValor = [];
+        var consumoValor = [];
+        var entradaValor = [];
+        var percentual = [];
+        var empresaid = 2018
+
+    function trazDados()
+  {
+        $.ajax({
+
+            type: 'GET',
+            data: {
+                empresaid
+
+            },
+            url: '/api/EstoqueConsumoAtuais/FamilaTop10',
+            dataSrc: "",
+            success: function (d) {
+                for (i = 0; i < d.length; i++) {
+                    familia.push(d[i].familiaNome);
+                    sapValor.push(d[i].sapValor);
+                    consumoValor.push(d[i].consumoValor);
+                    entradaValor.push(d[i].entradaValor);
+                    percentual.push(d[i].percentual)
+                };
+
+                GrafC3()
+                
+            },
+            datatype: 'json'
+        });
+   }
+
+        function GrafC3() {
+            var chart = c3.generate({
+                bindto: '#chart',
+                size: {
+                    height:600
+                },
+                data: {
+                    x: 'x',
+                    columns: [
+                        ['x',
+                            familia[0],
+                            familia[1],
+                            familia[2],
+                            familia[3],
+                            familia[4],
+                            familia[5],
+                            familia[6],
+                            familia[7],
+                            familia[8],
+                            familia[9]
+
+
+
+                        ],
+                        ['Estoque',
+                            sapValor[0].toFixed(2),
+                            sapValor[1].toFixed(2),
+                            sapValor[2].toFixed(2),
+                            sapValor[3].toFixed(2),
+                            sapValor[4].toFixed(2),
+                            sapValor[5].toFixed(2),
+                            sapValor[6].toFixed(2),
+                            sapValor[7].toFixed(2),
+                            sapValor[8].toFixed(2),
+                            sapValor[9].toFixed(2)
+
+                        ],
+                        ['Consumo',
+                            consumoValor[0].toFixed(2),
+                            consumoValor[1].toFixed(2),
+                            consumoValor[2].toFixed(2),
+                            consumoValor[3].toFixed(2),
+                            consumoValor[4].toFixed(2),
+                            consumoValor[5].toFixed(2),
+                            consumoValor[6].toFixed(2),
+                            consumoValor[7].toFixed(2),
+                            consumoValor[8].toFixed(2),
+                            consumoValor[9].toFixed(2)
+
+
+                        ],
+
+                        ['Entrada',
+                            entradaValor[0].toFixed(2),
+                            entradaValor[1].toFixed(2),
+                            entradaValor[2].toFixed(2),
+                            entradaValor[3].toFixed(2),
+                            entradaValor[4].toFixed(2),
+                            entradaValor[5].toFixed(2),
+                            entradaValor[6].toFixed(2),
+                            entradaValor[7].toFixed(2),
+                            entradaValor[8].toFixed(2),
+                            entradaValor[9].toFixed(2)
+
+
+                        ],
+
+                        ['Percentual',
+                            (percentual[0] * 100).toFixed(2),
+                            (percentual[1] * 100).toFixed(2),
+                            (percentual[2] * 100).toFixed(2),
+                            (percentual[3] * 100).toFixed(2),
+                            (percentual[4] * 100).toFixed(2),
+                            (percentual[5] * 100).toFixed(2),
+                            (percentual[6] * 100).toFixed(2),
+                            (percentual[7] * 100).toFixed(2),
+                            (percentual[8] * 100).toFixed(2),
+                            (percentual[9] * 100).toFixed(2)
+
+
+
+                        ]
+
+                    ],
+                    //axes: {
+                    ////    Estoque: 'y',
+                    //    Percentual: 'y2'
+                    //},
+                    //groups: [
+                    //    ['Estoque', 'Consumo', 'Entrada', 'Percentual']
+                    //],
+                    type: 'bar',
+                    //labels: {
+                    //    //            format: function (v, id, i, j) { return "Default Format"; },
+
+                    //    //format: d3.format("$,")
+                    //   // format: function (x) {
+                    //    //    return Math.floor(x, 2) + " MR$";
+
+                    //    },
+                    labels:true,
+                        types: {
+
+                            Percentual: 'line'
+
+                        }
+
+
+                    },
+                    grid: {
+                        y: {
+                            lines: [{ value: 0 }]
+
+                        }
+
+                    },
+                    axis: {
+                        x: {
+                            type: 'category' // this needed to load string x value
+                        },
+                        y: {
+                            show: false
+                        }
+                        //y2: {
+                        //    show: true
+                        //}
+                    },
+                    backgroundColor: "#FFF"
+                
+            });
+        }
+        
+
+    //function CarregaGraficos() {
+    //    var ctx = document.getElementById("myChart").getContext('2d');
+
+    //  //  var bar_ctx = document.getElementById('bar-chart').getContext('2d');
+    //    var purple_orange_gradient = ctx.createLinearGradient(0, 0, 0, 600);
+    //    purple_orange_gradient.addColorStop(0, 'orange');
+    //    purple_orange_gradient.addColorStop(1, 'purple');
+
+    //    var mixedChart = new Chart(ctx, {
+    //        type: 'bar',
+    //        data: {
+    //            datasets:
+    //            [
+
+
+    //                {
+    //                    label: 'Estoque',
+    //                    data: sapValor,
+    //                    backgroundColor:
+    //                    [
+    //                        purple_orange_gradient,
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+    //                        'rgba(20, 56, 202, 0.91)',
+
+
+    //                    ],
+    //                    yAxisID: 'left-y-axis'
+    //                },
+    //                {
+    //                    label: 'Consumo',
+    //                    data: [
+    //                        14.54,
+    //                        23.09,
+    //                        18.97,
+    //                        17.96,
+    //                        16.09,
+    //                        15.07,
+    //                        13.30,
+    //                        13.09,
+    //                        12.64,
+    //                        12.11],
+    //                    backgroundColor:
+    //                    [
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+    //                        'rgba(200, 230, 256, 0.91)',
+
+
+    //                    ],
+    //                    yAxisID: 'left-y-axis'
+    //                },
+    //                {
+    //                    label: 'Percentual',
+    //                    data: percentual,
+
+
+    //                    type: 'line',
+    //                    //backgroundColor: 'rgba(255, 100, 56, 0.91)',
+    //                    yAxisID: 'right-y-axis',
+    //                }
+
+    //            ],
+    //            labels: familia
+
+    //        },
+
+    //        options: {
+    //            scales: {
+    //                yAxes: [{
+    //                    id: 'left-y-axis',
+    //                    type: 'linear',
+    //                    position: 'left'
+    //                }, {
+    //                    id: 'right-y-axis',
+    //                    type: 'linear',
+    //                    position: 'right'
+    //                }]
+    //            }
+    //        }
+    //    });
+    //}
+
+    //function CarregaGraficosGoogle()
+    //    {
+    //        google.charts.load('current', { 'packages': ['corechart'] });
+    //        google.charts.setOnLoadCallback(drawVisualization);
+
+    //        function drawVisualization() {
+    //            // Some raw data (not necessarily accurate)
+    //            var data = google.visualization.arrayToDataTable([
+    //                ['Familia', 'Estoque',  'Percentual'],
+    //                [familia[0], sapValor[0], percentual[0]],
+    //                [familia[1], sapValor[1], percentual[1]],
+    //                [familia[2], sapValor[2], percentual[2]],
+    //                [familia[3], sapValor[3], percentual[3]],
+    //                [familia[4], sapValor[4], percentual[4]],
+    //                [familia[5], sapValor[5], percentual[5]],
+    //                [familia[6], sapValor[6], percentual[6]],
+    //                [familia[7], sapValor[7], percentual[7]],
+
+    //            ]);
+
+    //            var options = {
+    //                title: 'Top 10 materiais com maior valor em Estoque',
+    //              //  vAxis: { title: 'Cups' },
+    //               // hAxis: { title: 'Familias' },
+    //                seriesType: 'bars',
+    //                series: { 1: { type: 'line' } }
+    //            };
+
+    //            var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+    //            chart.draw(data, options);
+    //        }
+    //    }
+
+    //function Graf3()
+    //    {
+    //        var ctx = document.getElementById("myChart");
+    //        var myChart = new Chart(ctx, {
+    //            type: 'line',
+    //            data: {
+    //                datasets: [{
+    //                    data: [20, 50, 100, 75, 25, 0],
+    //                    label: 'Left dataset',
+
+    //        // This binds the dataset to the left y axis
+    //        yAxisID: 'left-y-axis'
+    //                }, {
+    //                    data: [0.1, 0.5, 1.0, 2.0, 1.5, 0],
+    //        label: 'Right dataset',
+
+    //        // This binds the dataset to the right y axis
+    //        yAxisID: 'right-y-axis',
+    //                }],
+    //                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+    //            },
+    //            options: {
+    //                scales: {
+    //                    yAxes: [{
+    //                        id: 'left-y-axis',
+    //                        type: 'linear',
+    //                        position: 'left'
+    //                    }, {
+    //                        id: 'right-y-axis',
+    //                        type: 'linear',
+    //                        position: 'right'
+    //                    }]
+    //                }
+    //            }
+    //        });
+    //    }
+
+
+
+
+        $(document).ready(function () {
+           // alert('carregou');
+            trazDados();
+           // GrafC3()
+          //  Graf3();
+           // CarregaGraficosGoogle();
+        });
+    </script>
+}

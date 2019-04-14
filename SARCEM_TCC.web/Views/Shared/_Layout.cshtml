@@ -3,42 +3,129 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <title>@ViewBag.Title - Portal Logística de Materiais</title>
+    @*@Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")*@
+
+    <link href="/Content/bootstrap-theme.css" rel="stylesheet" />
+    <link href="/content/datatables/css/datatables.bootstrap.css" rel="stylesheet" />
+    <link href="/content/datatables/css/datatablesV1.css" rel="stylesheet" />
+    <link href="/Content/select2.css" rel="stylesheet" />
+    <link href="/Content/select2-bootstrap.css" rel="stylesheet" />
+    <link href="/content/tableexport/tableexport.css" rel="stylesheet" />
+    <link href="/Content/bootstrapSlate.css" rel="stylesheet" />
+    <link href="/Content/Site.css" rel="stylesheet" />
+    <link href="/Content/Site2.css" rel="stylesheet" />
+    <script src="/Scripts/modernizr-2.6.2.js"></script>
+
+    <style>
+        .select2-search--dropdown {
+            display: block;
+            padding: 4px;
+            background-color: #3a3439;
+        }
+
+
+        .select2-container--classic .select2-results > .select2-results__options {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #3a3439;
+        }
+
+
+        .select2-container--classic.select2-container--open .select2-selection--single .select2-selection__arrow {
+            background: rgba(0, 0, 0, 0.74);
+            border: none;
+        }
+
+        .select2-container--classic .select2-selection--single {
+            border: 1px solid #6d6464;
+            border-radius: 4px;
+            outline: 0;
+            background-image: linear-gradient(to bottom, #f9f1f1 50%, #504d4d 100%);
+            background-repeat: repeat-x;
+        }
+
+            .select2-container--classic .select2-selection--single .select2-selection__arrow {
+                border: none;
+                border-left: 1px solid #4c2b2b;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 8px;
+                height: 26px;
+                position: absolute;
+                top: 1px;
+                right: 1px;
+                width: 20px;
+                background-image: linear-gradient(to bottom, #525050 50%, #000000 100%);
+                background-repeat: repeat-x;
+            }
+
+            .select2-container--classic .select2-selection--single .select2-selection__placeholder {
+                color: #2f3738;
+            }
+        .red {
+            background-color: #a71616;
+            color: #ffffff;
+        }
+
+    </style>
+
 
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
+
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <span style="background-color:black;box-shadow: -1px -1px 17px 6px black;">
+                    <a href="/Home"> <img alt='Logo' src='/imagens/headRedesignLogo.png' height='50' /></a>
+                </span>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                </ul>
+
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
     <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        <img id="imagemLoad" src="~/imagens/aguarde.gif" style="position:absolute; left:40%;top:40%; z-index:1; display:none " />
+        <div class="spaceVert_1">
+
+        </div>
+        <div class="jumbotron">
+
+            @RenderBody()
+            </div>
+            
+        </div>
+    <div class="pull-right">
+        <footer class="footer-pos">
+
+            @{ 
+                var version = @ViewContext.Controller.GetType().Assembly.GetName().Version;
+            }
+         
+            <p>&copy; @DateTime.Now.Year - DW SoftTech &reg; versão do Software: @version  </br>Atualizado em 31/03/2019 </p>
         </footer>
     </div>
+    @*@Scripts.Render("~/bundles/Lib")*@
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    <script src="/Scripts/jquery-1.12.4.js"></script>
+    <script src="/Scripts/TableExport/xlsx.core.js"></script>
+    <script src="/Scripts/TableExport/FileSaver.js"></script>
+    <script src="/Scripts/bootstrap.js"></script>
+    <script src="/Scripts/respond.js"></script>
+    <script src="/scripts/datatables/datatablesV1.js"></script>
+    <script src="/scripts/datatables/datatables.bootstrap.js"></script>
+    <script src="/scripts/TableExport/tableexport.js"></script>
+    <script src="/scripts/select2.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.fixedColumns.min.js"></script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

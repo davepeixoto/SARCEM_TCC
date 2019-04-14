@@ -1,14 +1,13 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Mvc;
+﻿using SARCEM_TCC.web.Data.Context;
+using SARCEM_TCC.web.Models;
+using SARCEM_TCC.web.Models.Domain;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using SARCEM_TCC.web.Models;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
 
 namespace SARCEM_TCC.web.Controllers
 {
@@ -17,12 +16,13 @@ namespace SARCEM_TCC.web.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _context;
 
         public AccountController()
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -34,9 +34,9 @@ namespace SARCEM_TCC.web.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -72,25 +72,56 @@ namespace SARCEM_TCC.web.Controllers
             {
                 return View(model);
             }
+            Usuario user;
+            SignInStatus result;
+            
+            try
+            {
+                _context = new ApplicationDbContext();
+              
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                 user = _context.Usuarios.Where(c => c.UserBR == model.UserBr.ToUpper()).First();
+                _context.Dispose();
+
+            }
+            catch (System.Exception )
+            {
+                ModelState.AddModelError("", "Login Inválido");
+                return View(model);
+            }
+
+
+
+
+            if (!user.EmailConfirmed)
+            {
+                ModelState.AddModelError("", "Seu acesso está em fase de liberação, em breve você poderá acessar.");
+                return View(model);
+            }
+
+            result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: true);
+
             switch (result)
             {
                 case SignInStatus.Success:
+                    if (model.Password == "@Teste123")
+                    {
+                        return RedirectToAction("ChangePassword", "Manage");
+                    }else
+                    {
+
                     return RedirectToLocal(returnUrl);
+                    }
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
                 case SignInStatus.Failure:
                 default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
+                    ModelState.AddModelError("", "Login Inválido");
                     return View(model);
             }
         }
-
         //
         // GET: /Account/VerifyCode
         [AllowAnonymous]
@@ -120,7 +151,7 @@ namespace SARCEM_TCC.web.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -139,8 +170,19 @@ namespace SARCEM_TCC.web.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            _context = new ApplicationDbContext();
+
+            var viewModel = new RegisterViewModel()
+            {
+                Empresas = _context.Empresas.ToList(),
+               
+            };
+
+
+            return View("Register", viewModel);
         }
+
+
 
         //
         // POST: /Account/Register
@@ -151,27 +193,76 @@ namespace SARCEM_TCC.web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new Usuario
+                {
+
+                    UserName = model.UserName,
+                    UserBR = model.UserBr.ToUpper(),
+                    Email = model.Email.ToLower(),
+                    EmpresaID = model.EmpresaID,
+                  //  UsuarioLogisticaAtividadeID = model.UsuarioLogisticaAtividadeID
+                    // TwoFactorEnabled=true,
+                    //DiretoriaID = 1
+                };
+
+                try
+                {
+                    _context = new ApplicationDbContext();
+
+                   var  tUser = _context.Usuarios.Where(c => c.UserBR == user.UserBR.ToUpper()).First();
+
+                    if (tUser != null)
+                    {
+
+                        ModelState.AddModelError("","Esse BR já foi Cadastrado!");
+                        // var viewModel = new RegisterViewModel()
+                        //{
+                        model.Empresas = _context.Empresas.ToList();
+                     //   model.UsuarioLogisticaAtividades = _context.UsuarioLogisticaAtividades.ToList();
+                        //};
+                        return View(model);
+                    }
+
+                    
+
+                }
+                catch (System.Exception)
+                {
+                    _context.Dispose();
+                }
+
                 var result = await UserManager.CreateAsync(user, model.Password);
+                
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    //var sb = new StringBuilder();
+                    //var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
 
-                    return RedirectToAction("Index", "Home");
+                    //sb.Append("<H3>");
+                    //sb.Append("Olá " + user.UserName + "</h3>");
+                    //sb.Append("<h4>Identificação: " + user.UserBR +"</h4>");
+                    //sb.Append("<h4>Email: " + user.Email + "</h4>");
+                    //sb.Append("<p> Recebemos sua solicitação de cadastro, favor clicar no link abaixo para confirmar sua conta:</p>");
+                    //sb.Append("<a href='" + callbackUrl + "'> Confirmação de Casdastro </a>");
+                    //await UserManager.SendEmailAsync(
+                    //    user.Id,
+                    //    "Confirmação de Cadastro."
+                    //    ,sb.ToString());
+
+                    ViewBag.Nome = user.UserName;
+                  //  ViewBag.Link = callbackUrl;
+                    return View("DisplayEmail");
                 }
                 AddErrors(result);
+                
             }
-
-            // If we got this far, something failed, redisplay form
+            _context = new ApplicationDbContext();
+            model.Empresas = _context.Empresas.ToList();
+           // model.UsuarioLogisticaAtividades = _context.UsuarioLogisticaAtividades.ToList();
+            _context.Dispose();
             return View(model);
         }
-
         //
         // GET: /Account/ConfirmEmail
         [AllowAnonymous]
@@ -202,7 +293,26 @@ namespace SARCEM_TCC.web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
+
+                Usuario userr;
+               
+
+                try
+                {
+                    _context = new ApplicationDbContext();
+
+                    userr = _context.Usuarios.Where(c => c.Email == model.Email.ToUpper()).First();
+                    _context.Dispose();
+
+                }
+                catch (System.Exception)
+                {
+                    ModelState.AddModelError("", "Email Inválido");
+                    return View(model);
+                }
+
+
+                var user = await UserManager.FindByNameAsync(userr.UserName);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -211,10 +321,10 @@ namespace SARCEM_TCC.web.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id,  code }, protocol: Request.Url.Scheme);		
+                 await UserManager.SendEmailAsync(user.Id, "Reset de Senha", "Por favor clique no link abaixo para trocar a senha.</br> <a href=\"" + callbackUrl + "\">Trocar a Senha</a>");
+                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // If we got this far, something failed, redisplay form
@@ -314,7 +424,7 @@ namespace SARCEM_TCC.web.Controllers
             {
                 return View("Error");
             }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider,  model.ReturnUrl, RememberMe = model.RememberMe });
         }
 
         //

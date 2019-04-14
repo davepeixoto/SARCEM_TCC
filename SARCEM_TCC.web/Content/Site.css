@@ -1,24 +1,94 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+﻿
+
+.select2-search--dropdown {
+    display: block;
+    padding: 4px;
+    background-color: #3a3439;
 }
 
-/* Set padding to keep content from hitting the edges */
+
+.select2-container--classic .select2-results > .select2-results__options {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #3a3439;
+}
+
+
+.select2-container--classic.select2-container--open .select2-selection--single .select2-selection__arrow {
+    background: rgba(0, 0, 0, 0.74);
+    border: none;
+}
+
+.select2-container--classic .select2-selection--single {
+    
+    border: 1px solid #6d6464;
+    border-radius: 4px;
+    outline: 0;
+    background-image: linear-gradient(to bottom, #f9f1f1 50%, #504d4d 100%);
+    background-repeat: repeat-x;
+}
+    .select2-container--classic .select2-selection--single .select2-selection__arrow {
+     
+        border: none;
+        border-left: 1px solid #4c2b2b;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 8px;
+        height: 26px;
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        width: 20px;
+        background-image: linear-gradient(to bottom, #525050 50%, #000000 100%);
+        background-repeat: repeat-x;
+     
+    }
+.select2-container--classic .select2-selection--single .select2-selection__placeholder {
+    color: #2f3738;
+}
+
+
+
+
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+    
+}
+
+
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
 .dl-horizontal dt {
     white-space: normal;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+
+.selectize-input {
+    min-height: 34px;
+    max-width: 380px;
 }
+
+.nav {
+    margin-bottom: 0;
+    padding-left: 20px;
+    list-style: none;
+}
+
+.th {
+    text-align: center;
+}
+
+
+.spaceVert_1{
+margin-top:2%;
+}
+
+.label-radio {
+    float: initial;
+    font-size: small;
+}
+

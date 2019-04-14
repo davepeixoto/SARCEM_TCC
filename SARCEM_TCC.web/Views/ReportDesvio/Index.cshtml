@@ -1,0 +1,200 @@
+﻿
+@{
+    ViewBag.Title = "Relatório de Desvios";
+}
+
+<h2>@ViewBag.Title</h2>
+<link href="~/Content/c3.css" rel="stylesheet" />
+
+<div id="chart"></div>
+@*<canvas id="myChart"></canvas>
+
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>*@
+<script src="~/Scripts/d3.min.js" charset="utf-8"></script>
+<script src="~/Scripts/c3.min.js"></script>
+
+@section scripts
+{
+    <script src="~/Scripts/Chart.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+
+        var estoque = [];
+        var consumo = [];
+        var entrada = [];
+        var plm = [];
+        var appia = [];
+        var periodo = [];
+
+
+        $(document).ready(function () {
+            trazDados();
+        });
+
+
+        function trazDados() {
+            $.ajax({
+
+                type: 'GET',
+                //data: {
+                //    empresaid
+
+                //},
+                url: '/api/reportdesvios/Base',
+                dataSrc: "",
+                success: function (d) {
+                    {
+                        estoque = d.estoque
+                        consumo = d.consumo
+                        entrada = d.entrada
+                        plm = d.plm
+                        appia = d.appia
+                        periodo = d.periodo
+
+
+                    };
+                    GrafC3()
+
+
+                },
+                datatype: 'json'
+            });
+        }
+
+        function GrafC3() {
+            var chart = c3.generate({
+                bindto: '#chart',
+                size: {
+                    height: 600
+                },
+                data: {
+                    x: 'Periodo',
+                    columns: [
+                        [
+                            'Periodo',
+                            periodo[0],
+                            periodo[1],
+                            periodo[2],
+                            periodo[3],
+                            periodo[4],
+                            periodo[5],
+                            periodo[6],
+                            periodo[7],
+                            periodo[8],
+                            periodo[9],
+                            periodo[10],
+                            periodo[11]
+                        ],
+                        [
+                            'Estoque',
+                            estoque[0],
+                            estoque[1],
+                            estoque[2],
+                            estoque[3],
+                            estoque[4],
+                            estoque[5],
+                            estoque[6],
+                            estoque[7],
+                            estoque[8],
+                            estoque[9],
+                            estoque[10],
+                            estoque[11]
+                            
+
+                        ],
+                        [
+                            'Consumo',
+                            consumo[0],
+                            consumo[1],
+                            consumo[2],
+                            consumo[3],
+                            consumo[4],
+                            consumo[5],
+                            consumo[6],
+                            consumo[7],
+                            consumo[8],
+                            consumo[9],
+                            consumo[10],
+                            consumo[11]
+
+                        ]
+                        ,
+                        [
+                            'Entrada',
+                            entrada[0],
+                            entrada[1],
+                            entrada[2],
+                            entrada[3],
+                            entrada[4],
+                            entrada[5],
+                            entrada[6],
+                            entrada[7],
+                            entrada[8],
+                            entrada[9],
+                            entrada[10],
+                            entrada[11]
+
+                        ]
+                        ,
+                        [
+                            'Plm',
+                            plm[0],
+                            plm[1],
+                            plm[2],
+                            plm[3],
+                            plm[4],
+                            plm[5],
+                            plm[6],
+                            plm[7],
+                            plm[8],
+                            plm[9],
+                            plm[10],
+                            plm[11]
+
+                        ]
+
+                        ,
+                        [
+                            'Appia',
+                            appia[0],
+                            appia[1],
+                            appia[2],
+                            appia[3],
+                            appia[4],
+                            appia[5],
+                            appia[6],
+                            appia[7],
+                            appia[8],
+                            appia[9],
+                            appia[10],
+                            appia[11]
+
+                        ]
+                    ]
+                    //json: {
+                    //     estoque, consumo
+                    ,
+                    labels: true,
+                   // groups: [['Estoque', 'Consumo','Entrada','Plm','Appia']],
+                    type: 'line'
+                },
+                axis: {
+                    x: {
+                        type: 'category' // this needed to load string x value
+                    }
+                },
+
+                tooltip: {
+                    
+                }
+                    
+                
+
+            });
+        }
+
+
+    </script>
+
+}

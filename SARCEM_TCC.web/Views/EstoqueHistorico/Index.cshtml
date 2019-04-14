@@ -1,0 +1,927 @@
+﻿@using SARCEM_TCC.web.Models
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Historico do Estoque";
+
+
+}
+
+<div style="float:left">
+<h2>@ViewBag.Title </h2>
+<h4>Traz informações de Estoque (Entrada, Consumo e Fechamento de Estoque) nos últimos 12 meses</h4>
+<h6>Informação baseada no fechamento de @ViewBag.labeldata</h6>
+
+</div>
+
+
+<div style="float:right;margin-top: 2%;padding-right: 2%;">
+
+    <h5 id="headerEmpresa"> <span id="spanEmpresa"></span></h5>
+
+
+</div>
+
+@{
+    string dropdow = "";
+
+    if (User.IsInRole(RoleName.Brazil))
+    {
+        dropdow = "_DropDownsBrazil";
+    }
+    else
+    {
+
+        dropdow = "_DropDowns";
+    }
+
+
+}
+<div class="row">
+
+
+
+    <div id="DropDownsContainer" style="margin-top:1%">
+
+        @Html.Partial(dropdow)
+
+    </div>
+</div>
+
+
+
+
+
+<div id="RadioContainer">
+    <div style="margin-top: 2%;">
+        @Html.Partial("_RadiosB")
+    </div>
+</div>
+
+<div style="margin-top: 3%; padding-top: 5%; padding-left: 4%;">
+    <div class="pull-left">
+        <input class="checkbox" type="checkbox" name="adm" value="adm" style="float:inherit" />
+        Considerar o Impacto do Administrativo
+    </div>
+
+    <div id="check" class="pull-left" style="display:none;  margin-left: 2%;">
+        <input class="checkbox" type="checkbox" name="ctLogis" value="ctLogis" style="float:inherit" />
+        Listar por Centro Logístico
+    </div>
+
+
+    <div class="pull-right">
+        <button id="btn_exporta" class="btn btn-default xlsx">Exporte para Excel</button>
+    </div>
+</div>
+
+
+
+
+
+
+<div class="col-lg-12" style="margin-top:2%;">
+
+    <style>
+        th {
+            text-align: center;
+        }
+
+        .DTFC_LeftBodyLiner {
+            top: -12px !important;
+        }
+    </style>
+    <div id="divEstoqueHistorico">
+    </div>
+
+
+</div>
+
+@section scripts
+{
+    <script>
+
+
+
+        var brazil
+            var cabecalho
+            var dto
+            var tipoRetorno
+            var ctLogistico
+            var mes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+            var mediaOuAcumulado
+            var labelMes;
+             var dataDoViewBag ="@ViewBag.data";
+            var ano = parseInt(dataDoViewBag.substr(0, 4))
+            var mesIndice = parseInt(dataDoViewBag.substr(5, 2))
+            var adm
+            //AnoAtual = data.getFullYear();
+
+            function AjustaLabelData() {
+
+
+                    ano--;
+                    labelMes = new Array();
+                   // labelMes.push(mes[mesIndice] + '-' + ano)
+
+                    for (i = 1; i <= 12; i++) {
+
+                        if (mesIndice > 11)
+                        {
+                            mesIndice = 0;
+                            ano++;
+
+                        }
+
+                        labelMes.push(mes[mesIndice] + '-' + ano)
+			 mesIndice++;
+
+                    }
+
+
+
+            }
+
+
+
+
+
+            function CarregaCabecalho() {
+
+                var imgm = $('#imagemLoad')[0]
+                imgm.style.display = ""
+
+                dto = {
+                    Empresa: $('#listaEmpresa').val(),
+                    Gestor: $('#listaGestor').val(),
+                    Familia: $('#listaFamilia').val(),
+                    Material: $('#listaMaterial').val(),
+                    Centro: $('#listaCentro').val(),
+
+
+                }
+
+                tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+                adm = $('.checkbox')[0].checked
+                ctLogistico = $('.checkbox')[1].checked
+
+                cabecalho = '';
+                cabecalho = new Array();
+
+                $.ajax({
+                    type: 'GET',
+                    data: {
+                        dto,
+                        tipoC: tipoRetorno,
+                        ctLogis: ctLogistico,
+                        adm: adm
+
+                    },
+                    url: '/api/EstoqueHistoricos/TrazDropDown',
+                    dataSrc: "",
+                    success: function (d) {
+
+                        cabecalho = d;
+                        CriaDropDowm(cabecalho);
+
+                    },
+                    datatype: 'json'
+
+                });
+
+
+            }
+
+
+
+            function CriaDropDowm(cabecalho) {
+                if (cabecalho.empresas.length ===1)
+                    $('#spanEmpresa')[0].textContent = cabecalho.empresas[0]
+                else
+                    $('#spanEmpresa')[0].textContent = ""
+
+
+                    $('#listaEmpresa').html('');
+
+                    if (dto.Empresa === '') {
+                        $('#listaEmpresa').append("<option value=''></option>");
+                        cabecalho.empresas.forEach(function (e) {
+                            $('#listaEmpresa').append("<option value='" + e + "'>" + e + "</option>");
+                        });
+
+                    } else {
+                        $('#listaEmpresa').append("<option value='" + dto.Empresa + "' selected>" + dto.Empresa + "</option>");
+                        $('#listaEmpresa').append("<option value='' ></option>");
+
+                    }
+
+
+                    if (dto.Centro === '') {
+                        $('#listaCentro').append("<option value=''></option>");
+                        cabecalho.centros.forEach(function (e) {
+                            $('#listaCentro').append("<option value='" + e + "'>" + e + "</option>");
+
+                        });
+                    } else {
+                        $('#listaCentro').append("<option value='" + dto.Centro + "' selected>" + dto.Centro + "</option>");
+                        $('#listaCentro').append("<option value=''></option>");
+                    }
+
+                    $('#listaCentro').select2({
+                        theme: "classic",
+                        placeholder: "Selecione o Centro",
+                        language: "pt-BR",
+                        allowClear: true
+                    });
+
+
+                //} else {
+                //    $('#divCentro')[0].style.display = "none"
+
+                //}
+
+
+
+
+
+
+                $('#listaMaterial').html('');
+                if (dto.Material === '') {
+                    $('#listaMaterial').append("<option value=''></option>");
+                    cabecalho.materiais.forEach(function (e) {
+                        $('#listaMaterial').append("<option value='" + e + "'>" + e + "</option>");
+                    });
+                } else {
+                    $('#listaMaterial').append("<option value='" + dto.Material + "'selected>" + dto.Material + "</option>");
+                    $('#listaMaterial').append("<option value=''></option>");
+                }
+
+
+                $('#listaFamilia').html('');
+                if (dto.Familia === '') {
+                    $('#listaFamilia').append("<option value=''></option>");
+                    cabecalho.familias.forEach(function (e) {
+                        $('#listaFamilia').append("<option value='" + e + "'>" + e + "</option>");
+                    });
+                } else {
+                    $('#listaFamilia').append("<option value='" + dto.Familia + "'selected>" + dto.Familia + "</option>");
+                    $('#listaFamilia').append("<option value=''></option>");
+                }
+
+                $('#listaGestor').html('');
+                if (dto.Gestor === '') {
+                    $('#listaGestor').append("<option value=''></option>");
+                    cabecalho.gestores.forEach(function (e) {
+                        $('#listaGestor').append("<option value='" + e + "'>" + e + "</option>");
+                    });
+                } else {
+                    $('#listaGestor').append("<option value='" + dto.Gestor + "' selected>" + dto.Gestor + "</option>");
+                    $('#listaGestor').append("<option value=''></option>");
+                }
+
+
+
+
+                $('#listaEmpresa').select2({
+                    theme: "classic",
+                    placeholder: "Selecione a Empresa",
+                    language: "pt-BR",
+                    allowClear: true
+                });
+
+
+
+
+
+                $('#listaMaterial').select2({
+                    theme: "classic",
+                    placeholder: "Selecione o Material",
+                    language: "pt-BR",
+                    allowClear: true
+                });
+
+                $('#listaFamilia').select2({
+                    theme: "classic",
+                    placeholder: "Selecione a Família",
+                    language: "pt-BR",
+                    allowClear: true
+                });
+
+                $('#listaGestor').select2({
+                    theme: "classic",
+                    placeholder: "Selecione o Gestor",
+                    language: "pt-BR",
+                    allowClear: true
+                });
+
+
+                var estilo = $('.select2');
+
+                for (var i = 0; i < estilo.length; i++) {
+                    estilo[i].style.width = '100%';
+                }
+
+                criaTabela();
+
+            }
+
+            function criaTabela() {
+
+
+
+
+                var sb = $('#divEstoqueHistorico')
+
+
+
+
+                sb.html('');
+
+
+
+                if (tipoRetorno === 'EstoqueValor' || tipoRetorno === 'EstoqueQtde' )
+                    mediaOuAcumulado = 'Média'
+                else
+                    mediaOuAcumulado = 'Acumulado'
+
+
+
+                if (tipoRetorno === 'Resumo')
+
+                {
+                    ctLogistico = false
+                    //$('#divCentro')[0].style.display = "none"
+                    $('#check')[0].style.display = "none"
+
+                    sb.append("<table id='tabelaEstoqueHistorico' class='table table- striped text- nowrap table- hover'>" +
+                        "<thead> <tr>" +
+
+
+                           "<th> Tipo da Informação</th>" +
+                        "<th>" + mediaOuAcumulado    + "</th>" +
+                        "<th>" + labelMes[11]        + "</th>" +
+                        "<th>" + labelMes[10]        + "</th>" +
+                        "<th>" + labelMes[9]         + "</th>" +
+                        "<th>" + labelMes[8]         + "</th>" +
+                        "<th>" + labelMes[7]         + "</th>" +
+                        "<th>" + labelMes[6]         + "</th>" +
+                        "<th>" + labelMes[5]         + "</th>" +
+                        "<th>" + labelMes[4]         + "</th>" +
+                        "<th>" + labelMes[3]         + "</th>" +
+                        "<th>" + labelMes[2]         + "</th>" +
+                        "<th>" + labelMes[1]         + "</th>" +
+                        "<th>" + labelMes[0]         + "</th>" +
+
+                        " </tr> </thead>" +
+                        "<tbody> </tbody> </table >");
+
+
+
+                    tabela = $("#tabelaEstoqueHistorico").DataTable({
+
+                        ajax: {
+                            type: 'GET',
+                            data: {
+                                dto,
+                                tipoC: tipoRetorno,
+                                ctLogis: ctLogistico,
+                                adm: adm
+
+
+                            },
+                            url: '/api/EstoqueHistoricos/ListaEstoqueHistorico',
+                            dataSrc: "",
+                        },
+                        columns: [
+
+                            { data: "tipoDaInforamcao" },
+                            { data: "acumulado", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                            { data: "m1", render: $.fn.dataTable.render.number('.', ',', 2) },
+
+                        ],
+
+                        "scrollX": true,
+                        "scrollY": "160px",
+                        "paging": false,
+                        "scrollCollapse": true,
+                        "deferRender": true,
+                        "fixedColumns": {
+                            leftColumns: 2,
+                        },
+
+                    });
+
+                }
+                else {
+
+                    $('#check')[0].style.display = ""
+
+                    if (ctLogistico) {
+
+                        sb.append("<table id='tabelaEstoqueHistorico' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th> " +
+                            " <th>Centro Logístico</th> " +
+                            " <th>Material</th>" +
+                            "<th>Descrição do Material</th>" +
+                            "<th>Unidade de Medida</th>" +
+                            "<th>Classe</th>" +
+                            "<th>classificacao</th>" +
+                            "<th>Família</th>" +
+                            "<th>MG Code</th>" +
+                            "<th>Descricao do MG Code</th>" +
+                            "<th>Gestor</th>" +
+                            "<th>Tipo da Informação</th>" +
+                            "<th>" + mediaOuAcumulado + "</th>" +
+                            "<th>" + labelMes[11] + "</th>" +
+                            "<th>" + labelMes[10] + "</th>" +
+                            "<th>" + labelMes[9] + "</th>" +
+                            "<th>" + labelMes[8] + "</th>" +
+                            "<th>" + labelMes[7] + "</th>" +
+                            "<th>" + labelMes[6] + "</th>" +
+                            "<th>" + labelMes[5] + "</th>" +
+                            "<th>" + labelMes[4] + "</th>" +
+                            "<th>" + labelMes[3] + "</th>" +
+                            "<th>" + labelMes[2] + "</th>" +
+                            "<th>" + labelMes[1] + "</th>" +
+                            "<th>" + labelMes[0] + "</th>" +
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaEstoqueHistorico").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+                                    dto,
+                                    tipoC: tipoRetorno,
+                                    ctLogis: ctLogistico,
+                                    adm: adm
+
+
+                                },
+                                url: '/api/EstoqueHistoricos/ListaEstoqueHistorico',
+                                dataSrc: "",
+                            },
+                            columns: [
+
+                                { data: "empresaNome" },
+                                { data: "centroLogisticoCodSap" },
+                                { data: "materialCodSap" },
+                                { data: "materialDescricao" },
+                                { data: "materialUM" },
+                                { data: "materialClasse" },
+                                { data: "classificacaoNome" },
+                                { data: "familiaNome" },
+                                { data: "mGCodeCodigoSap" },
+                                { data: "mGCodeDescricao" },
+                                { data: "userName" },
+                                { data: "tipoDaInforamcao" },
+                                { data: "acumulado", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m1", render: $.fn.dataTable.render.number('.', ',', 2) },
+
+
+
+
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "360px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 3,
+                            },
+
+                        });
+
+
+
+                    }
+
+                    else {
+
+
+
+                        sb.append("<table id='tabelaEstoqueHistorico' class='table table- striped text- nowrap table- hover'>" +
+                            "<thead> <tr>" +
+
+                            " <th>Empresa</th> " +
+                            //  " <th>Centro Logístico</th> " +
+                            " <th>Material</th>" +
+                            "<th>Descrição do Material</th>" +
+                            "<th>Unidade de Medida</th>" +
+                            "<th>Classe</th>" +
+                            "<th>classificacao</th>" +
+                            "<th>Família</th>" +
+                            "<th>MG Code</th>" +
+                            "<th>Descricao do MG Code</th>" +
+                            "<th>Gestor</th>" +
+                            "<th>Tipo da Informação</th>" +
+                            "<th>" + mediaOuAcumulado + "</th>" +
+                            "<th>" + labelMes[11] + "</th>" +
+                            "<th>" + labelMes[10] + "</th>" +
+                            "<th>" + labelMes[9] + "</th>" +
+                            "<th>" + labelMes[8] + "</th>" +
+                            "<th>" + labelMes[7] + "</th>" +
+                            "<th>" + labelMes[6] + "</th>" +
+                            "<th>" + labelMes[5] + "</th>" +
+                            "<th>" + labelMes[4] + "</th>" +
+                            "<th>" + labelMes[3] + "</th>" +
+                            "<th>" + labelMes[2] + "</th>" +
+                            "<th>" + labelMes[1] + "</th>" +
+                            "<th>" + labelMes[0] + "</th>" +
+
+                            " </tr> </thead>" +
+                            "<tbody> </tbody> </table >");
+
+
+
+                        tabela = $("#tabelaEstoqueHistorico").DataTable({
+
+                            ajax: {
+                                type: 'GET',
+                                data: {
+                                    dto,
+                                    tipoC: tipoRetorno,
+                                    ctLogis: ctLogistico,
+                                    adm: adm
+
+
+                                },
+                                //url: '/api/EstoqueHistoricos/ListaEstoqueHistorico',
+                                url:'/api/EstoqueHistoricos/ListaEstoqueHistorico',
+                                dataSrc: "",
+                            },
+                            columns: [
+
+                                { data: "empresaNome" },
+                                //  { data: "centroLogisticoCodSap" },
+                                { data: "materialCodSap" },
+                                { data: "materialDescricao" },
+                                { data: "materialUM" },
+                                { data: "materialClasse" },
+                                { data: "classificacaoNome" },
+                                { data: "familiaNome" },
+                                { data: "mGCodeCodigoSap" },
+                                { data: "mGCodeDescricao" },
+                                { data: "userName" },
+                                { data: "tipoDaInforamcao" },
+                                { data: "acumulado", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m12", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m11", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m10", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m9", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m8", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m7", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m6", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m5", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m4", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m3", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m2", render: $.fn.dataTable.render.number('.', ',', 2) },
+                                { data: "m1", render: $.fn.dataTable.render.number('.', ',', 2) },
+
+
+
+
+
+
+
+                            ],
+
+                            "scrollX": true,
+                            "scrollY": "360px",
+
+                            "scrollCollapse": true,
+                            "deferRender": true,
+                            "fixedColumns": {
+                                leftColumns: 2,
+                            },
+                        });
+
+
+
+
+                    }
+                }
+
+
+
+
+                var imgm = $('#imagemLoad')[0]
+                imgm.style.display = "none"
+            }
+
+            function ExportaPagina(result) {
+                table = '';
+
+                dataRst = '';
+
+
+
+                dataRst = new Array();
+
+
+                var i = 1;
+
+                if (tipoRetorno === 'Resumo') {
+                    dataRst[0] = [
+
+                        { v: "Tipo da Informação", t: 's' },
+                        { v: mediaOuAcumulado, t: 's' },
+                        { v: labelMes[11], t: 's' },
+                        { v: labelMes[10], t: 's' },
+                        { v: labelMes[9], t: 's' },
+                        { v: labelMes[8], t: 's' },
+                        { v: labelMes[7], t: 's' },
+                        { v: labelMes[6], t: 's' },
+                        { v: labelMes[5], t: 's' },
+                        { v: labelMes[4], t: 's' },
+                        { v: labelMes[3], t: 's' },
+                        { v: labelMes[2], t: 's' },
+                        { v: labelMes[1], t: 's' },
+                        { v: labelMes[0], t: 's' },
+
+
+                    ];
+
+                    result.forEach(function (r) {
+
+                        dataRst[i] = [
+                            { v: r.tipoDaInforamcao, t: 's' },
+                            { v: r.acumulado, t: 'n' },
+                            { v: r.m12, t: 'n' },
+                            { v: r.m11, t: 'n' },
+                            { v: r.m10, t: 'n' },
+                            { v: r.m9, t: 'n' },
+                            { v: r.m8, t: 'n' },
+                            { v: r.m7, t: 'n' },
+                            { v: r.m6, t: 'n' },
+                            { v: r.m5, t: 'n' },
+                            { v: r.m4, t: 'n' },
+                            { v: r.m3, t: 'n' },
+                            { v: r.m2, t: 'n' },
+                            { v: r.m1, t: 'n' },
+
+
+
+                        ]
+                        i++;
+                    });
+
+                }
+                else {
+                    if (ctLogistico) {
+                        dataRst[0] = [
+
+                            { v: 'Empresa', t: 's' },
+                            { v: 'Centro Logístico', t: 's' },
+                            { v: 'Material', t: 's' },
+                            { v: 'Descrição do Material', t: 's' },
+                            { v: 'Unidade de Medida', t: 's' },
+                            { v: 'Classe', t: 's' },
+                            { v: 'classificacao', t: 's' },
+                            { v: 'Família', t: 's' },
+                            { v: 'MG Code', t: 's' },
+                            { v: 'Descricao do MG Code', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            { v: "Tipo da Informação", t: 's' },
+                            { v: mediaOuAcumulado, t: 's' },
+                            { v: labelMes[11], t: 's' },
+                            { v: labelMes[10], t: 's' },
+                            { v: labelMes[9], t: 's' },
+                            { v: labelMes[8], t: 's' },
+                            { v: labelMes[7], t: 's' },
+                            { v: labelMes[6], t: 's' },
+                            { v: labelMes[5], t: 's' },
+                            { v: labelMes[4], t: 's' },
+                            { v: labelMes[3], t: 's' },
+                            { v: labelMes[2], t: 's' },
+                            { v: labelMes[1], t: 's' },
+                            { v: labelMes[0], t: 's' },
+
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresaNome, t: 's' },
+                                { v: r.centroLogisticoCodSap, t: 's' },
+                                { v: r.materialCodSap, t: 's' },
+                                { v: r.materialDescricao, t: 's' },
+                                { v: r.materialUM, t: 's' },
+                                { v: r.materialClasse, t: 's' },
+                                { v: r.classificacaoNome, t: 's' },
+                                { v: r.familiaNome, t: 's' },
+                                { v: r.mGCodeCodigoSap, t: 's' },
+                                { v: r.mGCodeDescricao, t: 's' },
+                                { v: r.userName, t: 's' },
+                                { v: r.tipoDaInforamcao, t: 's' },
+                                { v: r.acumulado, t: 'n' },
+                                { v: r.m12, t: 'n' },
+                                { v: r.m11, t: 'n' },
+                                { v: r.m10, t: 'n' },
+                                { v: r.m9, t: 'n' },
+                                { v: r.m8, t: 'n' },
+                                { v: r.m7, t: 'n' },
+                                { v: r.m6, t: 'n' },
+                                { v: r.m5, t: 'n' },
+                                { v: r.m4, t: 'n' },
+                                { v: r.m3, t: 'n' },
+                                { v: r.m2, t: 'n' },
+                                { v: r.m1, t: 'n' },
+
+
+
+                            ]
+                            i++;
+                        });
+                    }
+                    else {
+                        dataRst[0] = [
+                            { v: 'Empresa', t: 's' },
+
+                            { v: 'Material', t: 's' },
+                            { v: 'Descrição do Material', t: 's' },
+                            { v: 'Unidade de Medida', t: 's' },
+                            { v: 'Classe', t: 's' },
+                            { v: 'classificacao', t: 's' },
+                            { v: 'Família', t: 's' },
+                            { v: 'MG Code', t: 's' },
+                            { v: 'Descricao do MG Code', t: 's' },
+                            { v: 'Gestor', t: 's' },
+                            { v: "Tipo da Informação", t: 's' },
+                            { v: mediaOuAcumulado, t: 's' },
+                            { v: labelMes[11], t: 's' },
+                            { v: labelMes[10], t: 's' },
+                            { v: labelMes[9], t: 's' },
+                            { v: labelMes[8], t: 's' },
+                            { v: labelMes[7], t: 's' },
+                            { v: labelMes[6], t: 's' },
+                            { v: labelMes[5], t: 's' },
+                            { v: labelMes[4], t: 's' },
+                            { v: labelMes[3], t: 's' },
+                            { v: labelMes[2], t: 's' },
+                            { v: labelMes[1], t: 's' },
+                            { v: labelMes[0], t: 's' },
+
+
+                        ];
+
+                        result.forEach(function (r) {
+
+                            dataRst[i] = [
+                                { v: r.empresaNome, t: 's' },
+
+                                { v: r.materialCodSap, t: 's' },
+                                { v: r.materialDescricao, t: 's' },
+                                { v: r.materialUM, t: 's' },
+                                { v: r.materialClasse, t: 's' },
+                                { v: r.classificacaoNome, t: 's' },
+                                { v: r.familiaNome, t: 's' },
+                                { v: r.mGCodeCodigoSap, t: 's' },
+                                { v: r.mGCodeDescricao, t: 's' },
+                                { v: r.userName, t: 's' },
+                                { v: r.tipoDaInforamcao, t: 's' },
+                                { v: r.acumulado, t: 'n' },
+                                { v: r.m12, t: 'n' },
+                                { v: r.m11, t: 'n' },
+                                { v: r.m10, t: 'n' },
+                                { v: r.m9, t: 'n' },
+                                { v: r.m8, t: 'n' },
+                                { v: r.m7, t: 'n' },
+                                { v: r.m6, t: 'n' },
+                                { v: r.m5, t: 'n' },
+                                { v: r.m4, t: 'n' },
+                                { v: r.m3, t: 'n' },
+                                { v: r.m2, t: 'n' },
+                                { v: r.m1, t: 'n' },
+
+
+                            ]
+                            i++;
+                        });
+                    }
+
+
+
+            }
+
+
+                var table = $('#tabelaEstoqueHistorico').tableExport();
+                table.export2file(dataRst, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Extrato_EstoqueHistorico', '.xlsx')
+                var botao = $('#btn_exporta')[0]
+                var imagem = $('#imagemLoad')[0]
+                imagem.style.display = "none"
+                botao.style.visibility = "visible"
+
+            }
+
+
+
+
+
+
+
+        $(document).ready(function () {
+
+
+  brazil = @User.IsInRole(RoleName.Brazil).ToString().ToLower()
+                AjustaLabelData()
+                //tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+                //ctLogistico = $('.checkbox')[0].checked
+                CarregaCabecalho();
+                //criaTabela();
+
+
+                $('.demo-default').on("change", function () {
+                    CarregaCabecalho()
+                });
+
+                $('.radio').on('change', function () {
+                    tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+                    adm = $('.checkbox')[0].checked
+                    ctLogistico = $('.checkbox')[1].checked
+                    criaTabela();
+
+                });
+
+                $('.checkbox').on('change', function () {
+                    tipoRetorno = $('input[name=listagem]:checked')[0].defaultValue
+                    adm = $('.checkbox')[0].checked
+                    ctLogistico = $('.checkbox')[1].checked
+                    CarregaCabecalho();
+
+                });
+
+
+
+                $('#btn_exporta').on('click', function () {
+                    var botao = $('#btn_exporta')[0]
+                    var imagem = $('#imagemLoad')[0]
+                    imagem.style.display = ""
+                    botao.style.visibility = 'hidden'
+
+                    $.ajax({
+                        type: 'GET',
+                        data: {
+
+                            dto,
+                            tipoC: tipoRetorno,
+                            ctLogis: ctLogistico,
+                            adm: adm
+
+
+
+                        },
+                        url: '/api/EstoqueHistoricos/ListaEstoqueHistorico',
+                        dataSrc: "",
+                        success: function (d) {
+
+                            ExportaPagina(d);
+
+
+                        }
+
+                    })
+
+                });
+
+            });
+    </script>
+}
+
+
+
+
+
+
