@@ -15,6 +15,7 @@ namespace SARCEM_TCC.web.Data.Configs
 
             Property(c => c.MaterialCodSap).HasMaxLength(10);
             Property(c => c.MaterialClasse).HasMaxLength(2);
+            Property(c => c.MaterialUM).HasMaxLength(5);
 
              HasOptional(c => c.MaterialSub)
                 .WithMany()

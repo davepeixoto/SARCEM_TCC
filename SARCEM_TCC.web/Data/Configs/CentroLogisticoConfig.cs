@@ -10,7 +10,7 @@ namespace SARCEM_TCC.web.Data.Configs
             ToTable("CentrosLogisticos");
 
             Property(c => c.CentroLogisticoCodSap)
-                .HasMaxLength(4);
+                .HasMaxLength(8);
 
           
             HasMany(f => f.Me2mRecebedor)

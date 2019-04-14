@@ -1,4 +1,5 @@
-﻿using SARCEM_TCC.web.Data.Configs;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using SARCEM_TCC.web.Data.Configs;
 using SARCEM_TCC.web.Data.Configs.SqlViews;
 using SARCEM_TCC.web.Models;
 using SARCEM_TCC.web.Models.Domain;
@@ -6,7 +7,6 @@ using SARCEM_TCC.web.Models.Domain.DataMass;
 using SARCEM_TCC.web.Models.Domain.DataMass.QuickChangeMass;
 using SARCEM_TCC.web.Models.Domain.DataMass.Report.TempTable;
 using SARCEM_TCC.web.Models.Domain.DataMass.Report.View;
-using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 
@@ -18,7 +18,6 @@ namespace SARCEM_TCC.web.Data.Context
         public ApplicationDbContext()
 
            : base("logistica", throwIfV1Schema: false)
-          // : base("default", throwIfV1Schema: false)
         {
             this.Database.CommandTimeout = 600;
         }
@@ -80,17 +79,6 @@ namespace SARCEM_TCC.web.Data.Context
         public DbSet<ItemPedidoDeCompra> ItemPedidoDeCompras { get; set; }
         public DbSet<ZmepMensalizado> ZmepMensalizados { get; set; }
 
-        // Report
-        //public DbSet<RelacaoDeMaterial> RelacaoDeMateriais { get; set; }
-        //public DbSet<ReportDesviosBase> ReportDesviosBases { get; set; }
-        //public DbSet<ReportDesviosHeader> ReportDesviosHeaders { get; set; }
-        //public DbSet<ReportDesviosPresentation> ReportDesviosPresentations { get; set; }
-
-
-
-
-
-
 
         // Report.TempTable
         public DbSet<PlmMensalizado> PlmMensalizados { get; set; }
@@ -98,22 +86,9 @@ namespace SARCEM_TCC.web.Data.Context
        // public DbSet<AppiaQuery> AppiaQuerys { get; set; }
         public DbSet<GiroFechamentoMensal> GiroFechamentosMensais { get;set;}
 
-        // Report.View
-        //public DbSet<VEstoqueHistorico> VEstoqueHistoricos { get; set; }
-        //public DbSet<VCpmCentroMaterialReport> VCpmCentroMaterialReports { get; set; }
-        //public DbSet<VCpmMaterialReport> VCpmMaterialReports { get; set; }
-        //public DbSet<VEstoqueConsumoAtual> VEstoqueConsumoAtuais { get; set; }
-        //public DbSet<VAppiaQuery> VAppiaQuerys { get; set; }
-        //public DbSet<VPlmMensalizado> VPlmMensalizados { get; set; }
-        //public DbSet <VContrato> VContratos { get; set; }
-        //public DbSet<VMiniImpaq> VMiniImpaqs { get; set; }
-        //public DbSet<VZmep> VZmeps { get; set; }
-        //public DbSet<VMaterial> VMaterial { get; set; }
+     
         public DbSet<ValorReferencia> ValorReferencias { get; set; }
-        //public DbSet<VPlmMensalizadoLastYear> VPlmMensalizadoLastYears { get; set; }
-        //public DbSet<VF0b1> VF0b1s { get; set; }
-
-
+    
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
@@ -122,16 +97,7 @@ namespace SARCEM_TCC.web.Data.Context
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
 
-            //modelBuilder.Entity<IdentityRole>()
-            //    .Property(i => i.Name)
-            //    .HasColumnType("nvarchar");
-
-
-
-            //modelBuilder.Entity<IdentityUser>()
-            //    .Property(i => i.Email)
-            //    .HasColumnType("nvarchar")
-            //    .HasMaxLength(256);
+    
 
 
             modelBuilder.Entity<IdentityUserRole>().Property(c => c.UserId).HasMaxLength(128);
@@ -142,22 +108,6 @@ namespace SARCEM_TCC.web.Data.Context
 
             
 
-
-            //modelBuilder.Entity<CondicaoDePagamento>()
-            //    .Property(c => c.CondicaoDePagamentoDescricao)
-            //    .HasMaxLength(300);
-
-
-            //modelBuilder.Entity<HistoricoMaterial>()
-            //   .Property(so => so.HistMatDataLanc)
-            //   .HasColumnName("HistMatDataLanc")
-            //   .HasColumnType("datetime");
-
-
-            //modelBuilder.Entity<Material>()
-            //    .HasOptional(c => c.MaterialSub)
-            //    .WithMany()
-            //    .HasForeignKey(c => c.MaterialSubId);
 
             base.OnModelCreating(modelBuilder);
 
@@ -173,12 +123,7 @@ namespace SARCEM_TCC.web.Data.Context
             modelBuilder.Entity<VF0b1>()
                 .HasKey(f => f.MaterialID);
 
-            //modelBuilder.Configurations.Add(new IdentityUserClaimConfig());
-
-            //modelBuilder.Configurations.Add(new ReportDesviosBaseMap());
-            //modelBuilder.Configurations.Add(new ReportDesviosHeaderMap());
-            //modelBuilder.Configurations.Add(new ReportDesviosPresentationMap());
-
+     
 
             modelBuilder.Configurations.Add(new BaseCotacaoConfig());
             modelBuilder.Configurations.Add(new CentroLogisticoConfig());

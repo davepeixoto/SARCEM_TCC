@@ -8,7 +8,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 																																																																																	
 
-ALTER procedure [dbo].[Prc_PlmCobertura] as
+create procedure [dbo].[Prc_PlmCobertura] as
 																																																																																												
 declare @tbPlm as table(																																																																																						
 MatID int,																																																																																										

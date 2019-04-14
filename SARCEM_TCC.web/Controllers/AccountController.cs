@@ -1,9 +1,9 @@
-﻿using SARCEM_TCC.web.Data.Context;
-using SARCEM_TCC.web.Models;
-using SARCEM_TCC.web.Models.Domain;
-using Microsoft.AspNet.Identity;
+﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using SARCEM_TCC.web.Data.Context;
+using SARCEM_TCC.web.Models;
+using SARCEM_TCC.web.Models.Domain;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -84,7 +84,7 @@ namespace SARCEM_TCC.web.Controllers
                 _context.Dispose();
 
             }
-            catch (System.Exception )
+            catch (System.Exception e )
             {
                 ModelState.AddModelError("", "Login Inválido");
                 return View(model);
@@ -104,14 +104,13 @@ namespace SARCEM_TCC.web.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    if (model.Password == "@Teste123")
-                    {
-                        return RedirectToAction("ChangePassword", "Manage");
-                    }else
-                    {
-
+                    //if (model.Password == "@Teste123")
+                    //{
+                    //    return RedirectToAction("ChangePassword", "Manage");
+                    //}else
+                    //{
                     return RedirectToLocal(returnUrl);
-                    }
+                    //}
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -230,7 +229,7 @@ namespace SARCEM_TCC.web.Controllers
                 {
                     _context.Dispose();
                 }
-
+                user.EmailConfirmed = true;
                 var result = await UserManager.CreateAsync(user, model.Password);
                 
                 if (result.Succeeded)
@@ -249,6 +248,7 @@ namespace SARCEM_TCC.web.Controllers
                     //    user.Id,
                     //    "Confirmação de Cadastro."
                     //    ,sb.ToString());
+                    
 
                     ViewBag.Nome = user.UserName;
                   //  ViewBag.Link = callbackUrl;

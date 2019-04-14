@@ -38,21 +38,21 @@ namespace SARCEM_TCC.web.Helper
             #region RioDeJaneiro
             if (User.IsInRole(RoleName.RioDeJaneiro))
             {
-                return "Enel Rio de Janeiro";                       
+                return "Empresa Rio de Janeiro";                       
             }
             #endregion
 
             #region Ceara
             if (User.IsInRole(RoleName.Ceara))
             {
-                return "Enel Ceará";
+                return "Empresa Ceará";
             }
             #endregion
 
             #region Goias
             if (User.IsInRole(RoleName.Goias))
             {
-                return "Enel Goiás";
+                return "Empresa Goiás";
             }
             #endregion
 
