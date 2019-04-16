@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="View Report Class Diagram">
+    <Position X="0.531" Y="0.5" Height="0.635" Width="1.169" />
+  </Comment>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VZmep">
+    <Position X="7.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>IACAARgEAQAIlAABABCVCAEIAgAAAIIAhRDAKAAACQA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VZmep.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.ContratoResumo">
+    <Position X="7.25" Y="8.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAQAAAAAAAAAAACAAAAAAAAAAAAAABBAAAAAAIA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\ContratoResumo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.ValorReferencia">
+    <Position X="2.5" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAgAAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\ValorReferencia.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VAppiaQuery">
+    <Position X="14.5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>CECCARBAAAAIgBgACgSQCCIIAAgGAAABgQCCTAAAGAg=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VAppiaQuery.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VCobertura">
+    <Position X="22.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAARABAAAABQAAAIAACCAAIAAAAAACABAACIAAAAQ=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VCobertura.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VContrato">
+    <Position X="19" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>CAADQRQAAAAAhEAEAgWQCAAIAQAAAAAAwxFAKAABAIA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VContrato.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VCpmCentroMaterialReport">
+    <Position X="2.5" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>CACCARACAAAohAAAAACQAAAIAEcAAQACgQCACAAACAE=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VCpmCentroMaterialReport.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VCpmMaterialReport">
+    <Position X="10.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACCARACAAAohAAAAACQAAAIAEcAAQACgQCACAAACAE=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VCpmMaterialReport.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VEstoqueConsumoAtual">
+    <Position X="12.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>CACCwRAQAEAojAAAAACYGIAIhEAAAAACAQCACAAACAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VEstoqueConsumoAtual.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VEstoqueHistorico">
+    <Position X="17" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>CADCAZAAAAAohAEAAADQQCAYAAAAABADAQCACIgACAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VEstoqueHistorico.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VF0b1">
+    <Position X="22.25" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAQQAQAAAoDACAAACAAAAIAAAAAAAAgQCACAAACAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VF0b1.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VMaterial">
+    <Position X="2.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAARAAAAAIhCAAAACQAAgIAAAACAEGAQGACAAACAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VMaterial.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VMiniImpaq">
+    <Position X="5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACCgRBTAAAojQAgABCYaGAoMEQAAAACgRCACAAACCA=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VMiniImpaq.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Report.View.VPlmMensalizado">
+    <Position X="24.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>CACCAZAgAQgIgAgEZiawCABYAAgAAIAAgQLACJkBCAo=</HashCode>
+      <FileName>Models\Domain\DataMass\Report\View\VPlmMensalizado.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

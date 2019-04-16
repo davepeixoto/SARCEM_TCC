@@ -716,6 +716,11 @@
     <Content Include="obj\Debug\SARCEM_TCC.web.csproj.CoreCompileInputs.cache" />
     <Content Include="obj\Debug\SARCEM_TCC.web.csproj.GenerateResource.cache" />
     <Content Include="obj\Debug\SARCEM_TCC.web.csprojAssemblyReference.cache" />
+    <Content Include="ClassDiagram\InfraClassDiagram.cd" />
+    <Content Include="ClassDiagram\DomianClassDiagram.cd" />
+    <Content Include="ClassDiagram\DataMassClassDiagram.cd" />
+    <Content Include="ClassDiagram\QuickChangeClassDiagram.cd" />
+    <Content Include="ClassDiagram\ViewReportClassDiagram.cd" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\c3.js" />
     <Content Include="Scripts\c3.min.js" />

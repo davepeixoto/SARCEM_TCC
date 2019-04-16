@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Domain Class Diagram">
+    <Position X="0.5" Y="0.5" Height="0.667" Width="1.398" />
+  </Comment>
+  <Class Name="SARCEM_TCC.web.Models.Domain.BaseCotacao">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAABAAAAAACAEEAAAAACAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Domain\BaseCotacao.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.CentroLogistico">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CEAAAAAAgIBAECAAAlAAkQyEAQCAAAAAACAAAQAAEAA=</HashCode>
+      <FileName>Models\Domain\CentroLogistico.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Cidade">
+    <Position X="2.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIBAAABEAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Models\Domain\Cidade.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.ClasseAvaliacao">
+    <Position X="15.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAABAAAACAAAAAAAAAIAABAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Domain\ClasseAvaliacao.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Classificacao">
+    <Position X="15.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAEAAAAAAAAAAAAAAQAAAAAEAACAAQAAAAI=</HashCode>
+      <FileName>Models\Domain\Classificacao.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.CondicaoDePagamento">
+    <Position X="5.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAIAAAAAAEAAAEAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Domain\CondicaoDePagamento.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DemandaAppia">
+    <Position X="9.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Domain\DemandaAppia.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DemandaPlm">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Domain\DemandaPlm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Diretoria">
+    <Position X="13.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAEAAAAAAAAgAAAAAAACAAAAAAAACACQAAAAAAgE=</HashCode>
+      <FileName>Models\Domain\Diretoria.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Empresa">
+    <Position X="15.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAABAAAAQAEAAAAAEAAAAAAAAAAAACAAAAAEAAAgA=</HashCode>
+      <FileName>Models\Domain\Empresa.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Estado">
+    <Position X="4" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAQAAAAAAABAAAAAABAgAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Models\Domain\Estado.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Familia">
+    <Position X="7.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ADACAAAAAAAAAAAAAAAAAAAIAAAAAAECAAAAAAAAAAI=</HashCode>
+      <FileName>Models\Domain\Familia.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.HistoricoMaterial">
+    <Position X="9.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACACAAABAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Models\Domain\HistoricoMaterial.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Material">
+    <Position X="11.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAATAAAIAIFCAAAlDQASyECQCgiAEEACEICQAACgA=</HashCode>
+      <FileName>Models\Domain\Material.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.MGCode">
+    <Position X="13.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAACAI=</HashCode>
+      <FileName>Models\Domain\MGCode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.MovimentoEstoque">
+    <Position X="2.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAgAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Models\Domain\MovimentoEstoque.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.MovimentoSapN1">
+    <Position X="5.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAIABAAAAAgAAAAAAAgAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Domain\MovimentoSapN1.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.MovimentoSapN2">
+    <Position X="9.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEBAACAAAAAAgAAgAAAAAAACAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>Models\Domain\MovimentoSapN2.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Pais">
+    <Position X="0.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAEEAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Models\Domain\Pais.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.SubDiretoria">
+    <Position X="13.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACACIAAAAAAAAACBAAAAQEgE=</HashCode>
+      <FileName>Models\Domain\SubDiretoria.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.Usuario">
+    <Position X="2" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAABAAAAAA=</HashCode>
+      <FileName>Models\Domain\Usuario.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.UsuarioCliente">
+    <Position X="0.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAACAAAEAAAgE=</HashCode>
+      <FileName>Models\Domain\UsuarioCliente.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.UsuarioLogistica">
+    <Position X="2.75" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAIABAAAACAAA=</HashCode>
+      <FileName>Models\Domain\UsuarioLogistica.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.UsuarioLogisticaAtividade">
+    <Position X="0.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Models\Domain\UsuarioLogisticaAtividade.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

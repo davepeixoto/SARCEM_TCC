@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Data Mass Class Diagram">
+    <Position X="0.5" Y="0.5" Height="0.375" Width="1.7" />
+  </Comment>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Ajuste2015">
+    <Position X="0.5" Y="1" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAhAAAAAAAEAAACAABgKAEAgCAAAAABAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Ajuste2015.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Appia">
+    <Position X="7.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEBAAEAASAAABAAAAAAAAgAIAAgAAAABIAAACAAAEAk=</HashCode>
+      <FileName>Models\Domain\DataMass\Appia.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.BaseGiro">
+    <Position X="14.5" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ENAAAAAAAAiAhAAAAAAJGAAAAAAAAAACAgAAAIAAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\BaseGiro.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Ceco">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAACAAAAAAAAAACAQAAAAAAAIEKAABAAAAQAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Ceco.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Estoque">
+    <Position X="14.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEABAAAAAAAAZAAAAIAAEAAADAAAAAAUAoAAAAEAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Estoque.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Fornecedor">
+    <Position X="3.25" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAQAAAAAEADAAIAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Fornecedor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Giro">
+    <Position X="5.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AMACAAAAAAABBAAAAAACEAAACAIAAAAEAgAAIAAABAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Giro.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.HistoricoDeCompra">
+    <Position X="19" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AEAAAJAABAAABAAQEAAAQACDIgAADYAABACDAAgQBAA=</HashCode>
+      <FileName>Models\Domain\DataMass\HistoricoDeCompra.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.HistoricoPlm">
+    <Position X="7.5" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEBAAMAAAQEABAAAAgAAEgAIEAAAAAAAAgBAAIgAAAE=</HashCode>
+      <FileName>Models\Domain\DataMass\HistoricoPlm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Mb51">
+    <Position X="16.5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AMEAEQAAMAAAJQgAACAAFAAgCAAEgBCQAsBAAAAAACA=</HashCode>
+      <FileName>Models\Domain\DataMass\Mb51.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Me2m">
+    <Position X="3.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BGAAABAAEAAABAAAGBIAAAAABAAQAAABAAICACBAACA=</HashCode>
+      <FileName>Models\Domain\DataMass\Me2m.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Mm60">
+    <Position X="11.75" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAQYBAAAAAAAEABAAAAAAAAAAgAAAAAAgAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Mm60.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Nb">
+    <Position X="0.75" Y="7.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAABAAAAAAAEAAABAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Nb.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Ordem">
+    <Position X="9.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAABCAAwiACRAAAAAAAABAIIAAEAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Ordem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Plm">
+    <Position X="5.5" Y="4.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEBAAMAAAQEABAAAAgAAEgAIEAAAAAAAAgBAAIgAAAE=</HashCode>
+      <FileName>Models\Domain\DataMass\Plm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.ReferenciaDePreco">
+    <Position X="1" Y="4.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AEQAAAAAAAAABAAAAAAAAAAAAIIAAAAAAAIEAAAAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\ReferenciaDePreco.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Reserva">
+    <Position X="9.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AEACAABAAAAAhBAGCACAEgAASQAAgAgAAgBAAgCAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Reserva.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Zmov">
+    <Position X="24.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>REAAAACAIACIhACgEABEEIBQCAIAgGAWAhIAAAAQAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Zmov.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SARCEM_TCC.web.Models.Domain.DataMass.Zpi04">
+    <Position X="22.25" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AGAAAIIAQAACBCAKAYAAEACAiEEAgAAgA0ABAQQAAAA=</HashCode>
+      <FileName>Models\Domain\DataMass\Zpi04.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
